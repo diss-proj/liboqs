@@ -36,7 +36,7 @@
  *       seeds the PRNG using `syscall(SYS_getrandom, ...)` (32 bytes) by default..
  * @see prng_init, prng_get_bytes, main_hqc.c
  */
-int crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
+int hqc5v_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
 #ifdef VERBOSE
     printf("\n\n\n### KEYGEN ###");
 #endif
@@ -102,7 +102,7 @@ int crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
  *       seeds the PRNG using `syscall(SYS_getrandom, ...)` (32 bytes) by default..
  * @see prng_init, prng_get_bytes, main_hqc.c
  */
-int crypto_kem_enc(uint8_t *c_kem, uint8_t *K, const uint8_t *ek_kem) {
+int hqcv5_256_crypto_kem_enc(uint8_t *c_kem, uint8_t *K, const uint8_t *ek_kem) {
 #ifdef VERBOSE
     printf("\n\n\n\n### ENCAPS ###");
 #endif
@@ -163,7 +163,7 @@ int crypto_kem_enc(uint8_t *c_kem, uint8_t *K, const uint8_t *ek_kem) {
  *
  * @return Returns 0 on success.
  */
-int crypto_kem_dec(uint8_t *K_prime, const uint8_t *c_kem, const uint8_t *dk_kem) {
+int hqcv5_256_crypto_kem_dec(uint8_t *K_prime, const uint8_t *c_kem, const uint8_t *dk_kem) {
 #ifdef VERBOSE
     printf("\n\n\n\n### DECAPS ###");
 #endif
