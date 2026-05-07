@@ -6,10 +6,10 @@
 #include <oqs/oqs.h>
 
 #if defined(OQS_ENABLE_KEM_hqc_128)
-#define OQS_KEM_hqc_128_length_public_key 2249
-#define OQS_KEM_hqc_128_length_secret_key 2305
+#define OQS_KEM_hqc_128_length_public_key 2241
+#define OQS_KEM_hqc_128_length_secret_key 2321
 #define OQS_KEM_hqc_128_length_ciphertext 4433
-#define OQS_KEM_hqc_128_length_shared_secret 64
+#define OQS_KEM_hqc_128_length_shared_secret 32
 #define OQS_KEM_hqc_128_length_keypair_seed 0
 #define OQS_KEM_hqc_128_length_encaps_seed 0
 OQS_KEM *OQS_KEM_hqc_128_new(void);
