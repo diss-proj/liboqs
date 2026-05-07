@@ -36,7 +36,7 @@
  *       seeds the PRNG using `syscall(SYS_getrandom, ...)` (32 bytes) by default..
  * @see prng_init, prng_get_bytes, main_hqc.c
  */
-int hqc5v_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
+int hqcv5_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
 #ifdef VERBOSE
     printf("\n\n\n### KEYGEN ###");
 #endif

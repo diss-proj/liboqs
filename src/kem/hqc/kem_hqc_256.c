@@ -36,7 +36,7 @@ OQS_KEM *OQS_KEM_hqc_256_new(void) {
 
 extern int hqcv5_256_crypto_kem_keypair(uint8_t *pk, uint8_t *sk);
 extern int hqcv5_256_crypto_kem_enc(uint8_t *ct, uint8_t *ss, const uint8_t *pk);
-extern int hqcv6_256_crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);
+extern int hqcv5_256_crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);
 
 OQS_API OQS_STATUS OQS_KEM_hqc_256_keypair_derand(uint8_t *public_key, uint8_t *secret_key, const uint8_t *seed) {
 	(void)public_key;
