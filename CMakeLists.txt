@@ -241,6 +241,7 @@ set(INTERNAL_HEADERS ${PROJECT_SOURCE_DIR}/src/common/aes/aes.h
                      ${PROJECT_SOURCE_DIR}/src/common/rand/rand_nist.h
                      ${PROJECT_SOURCE_DIR}/src/common/sha2/sha2.h
                      ${PROJECT_SOURCE_DIR}/src/common/sha3/sha3.h
+                     ${PROJECT_SOURCE_DIR}/src/common/hqcv5_shims/fips202.h
                      ${PROJECT_SOURCE_DIR}/src/common/sha3/sha3x4.h)
 
 if(${OQS_ENABLE_KEM_BIKE})
@@ -327,7 +328,7 @@ if(NOT ${OQS_BUILD_ONLY_LIB})
     if(NOT WIN32)
         add_custom_target(
             prettyprint
-            COMMAND find src tests -name '*.[ch]' | grep -v '/external/' | grep -v 'kem.*/pqclean_' | grep -v 'sig.*/pqclean_' | xargs astyle --options=.astylerc
+            COMMAND find src tests -name '*.[ch]' | grep -v '/external/' | grep -v 'kem.*/pqclean_' | grep -v 'kem.*/hqcv5_' | grep -v 'sig.*/pqclean_' | xargs astyle --options=.astylerc
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             USES_TERMINAL)
     endif()
