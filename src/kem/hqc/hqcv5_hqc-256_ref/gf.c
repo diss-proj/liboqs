@@ -7,8 +7,8 @@
 #include <stdint.h>
 #include "parameters.h"
 
-static uint16_t gf_reduce(uint16_t x);
-void gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b);
+static uint16_t hqcv5_256_gf_reduce(uint16_t x);
+void hqcv5_256_gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b);
 
 /**
  * @brief Generates exp and log lookup tables of GF(2^8).
@@ -17,16 +17,16 @@ void gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b);
  *         the lookup table for GF(2^8).
  *
  * The logarithm of 0 is defined as 2^8 by convention. <br>
- * The last two elements of the exp table are needed by the gf_mul function from gf_lutmul.c
+ * The last two elements of the exp table are needed by the hqcv5_256_gf_mul function from gf_lutmul.c
  * (for example if both elements to multiply are zero).
  * @param[out] exp Array of size 2^8 + 2 receiving the powers of the primitive element
  * @param[out] log Array of size 2^8 receiving the logarithms of the elements of GF(2^m)
  * @param[in] m Parameter of Galois field GF(2^m)
  */
-void gf_generate(uint16_t *exp, uint16_t *log, const int16_t m) {
+void hqcv5_256_gf_generate(uint16_t *exp, uint16_t *log, const int16_t m) {
     uint16_t elt = 1;
     uint16_t alpha = 2;  // primitive element of GF(2^8)
-    uint16_t gf_poly = PARAM_GF_POLY;
+    uint16_t gf_poly = hqcv5_256_PARAM_GF_POLY;
 
     for (size_t i = 0; i < (1U << m) - 1; ++i) {
         exp[i] = elt;
@@ -44,7 +44,7 @@ void gf_generate(uint16_t *exp, uint16_t *log, const int16_t m) {
 }
 
 /**
- * @brief Feedback bit positions used for modular reduction by PARAM_GF_POLY = 0x11D.
+ * @brief Feedback bit positions used for modular reduction by hqcv5_256_PARAM_GF_POLY = 0x11D.
  *
  * These values are derived from the binary form of the polynomial:
  *     0x11D = 0b100011101 → bits set at positions: 8, 4, 3, 1, 0
@@ -60,27 +60,27 @@ void gf_generate(uint16_t *exp, uint16_t *log, const int16_t m) {
 static const uint8_t gf_reduction_taps[] = {4, 3, 2};
 
 /**
- * @brief Reduce a polynomial modulo PARAM_GF_POLY in GF(2^8).
+ * @brief Reduce a polynomial modulo hqcv5_256_PARAM_GF_POLY in GF(2^8).
  *
  * This function performs modular reduction of a 16-bit polynomial `x`
- * by the irreducible polynomial PARAM_GF_POLY = 0x11D
+ * by the irreducible polynomial hqcv5_256_PARAM_GF_POLY = 0x11D
  * (i.e., x⁸ + x⁴ + x³ + x + 1), used in GF(2^8).
  *
  * It assumes the input polynomial has degree ≤ 14 and uses a fixed
  * number of reduction steps and fixed feedback tap positions
  * ({4, 3, 2}) to produce a result of degree < 8.
  *
- * @param x 16-bit input polynomial to reduce (deg(x) ≤ 14)
- * @return Reduced 8-bit polynomial modulo PARAM_GF_POLY (deg(x) < 8)
+ * @param x 16-bit input polynomial to hqcv5_256_reduce (deg(x) ≤ 14)
+ * @return Reduced 8-bit polynomial modulo hqcv5_256_PARAM_GF_POLY (deg(x) < 8)
  */
-uint16_t gf_reduce(uint16_t x) {
+uint16_t hqcv5_256_gf_reduce(uint16_t x) {
     uint64_t mod;
     const int reduction_steps = 2;            // For deg(x) = 2 * (8 - 1) = 14, reduce twice to bring degree < 8
     const size_t gf_reduction_tap_count = 3;  // Number of feedback positions
 
     for (int i = 0; i < reduction_steps; ++i) {
-        mod = x >> PARAM_M;       // Extract upper bits
-        x &= (1 << PARAM_M) - 1;  // Keep lower bits
+        mod = x >> hqcv5_256_PARAM_M;       // Extract upper bits
+        x &= (1 << hqcv5_256_PARAM_M) - 1;  // Keep lower bits
         x ^= mod;                 // Pre-XOR with no shift
 
         uint16_t z1 = 0;
@@ -106,7 +106,7 @@ uint16_t gf_reduce(uint16_t x) {
  * @param[in] a The first polynomial
  * @param[in] b The second polynomial
  */
-void gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b) {
+void hqcv5_256_gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b) {
     uint16_t h = 0, l = 0, g, u[4];
     u[0] = 0;
     u[1] = b & ((1UL << 7) - 1UL);
@@ -150,11 +150,11 @@ void gf_carryless_mul(uint8_t *c, uint8_t a, uint8_t b) {
  * @param[in] a Element of GF(2^GF_M)
  * @param[in] b Element of GF(2^GF_M)
  */
-uint16_t gf_mul(uint16_t a, uint16_t b) {
+uint16_t hqcv5_256_gf_mul(uint16_t a, uint16_t b) {
     uint8_t c[2] = {0};
-    gf_carryless_mul(c, (uint8_t)a, (uint8_t)b);
+    hqcv5_256_gf_carryless_mul(c, (uint8_t)a, (uint8_t)b);
     uint16_t tmp = (uint16_t)(c[0] ^ (c[1] << 8));
-    return gf_reduce(tmp);
+    return hqcv5_256_gf_reduce(tmp);
 }
 
 /**
@@ -162,15 +162,15 @@ uint16_t gf_mul(uint16_t a, uint16_t b) {
  * @returns a^2
  * @param[in] a Element of GF(2^GF_M)
  */
-uint16_t gf_square(uint16_t a) {
+uint16_t hqcv5_256_gf_square(uint16_t a) {
     uint32_t b = a;
     uint32_t s = b & 1;
-    for (size_t i = 1; i < PARAM_M; ++i) {
+    for (size_t i = 1; i < hqcv5_256_PARAM_M; ++i) {
         b <<= 1;
         s ^= b & (1 << 2 * i);
     }
 
-    return gf_reduce(s);
+    return hqcv5_256_gf_reduce(s);
 }
 
 /**
@@ -179,20 +179,20 @@ uint16_t gf_square(uint16_t a) {
  * @returns the inverse of a
  * @param[in] a Element of GF(2^GF_M)
  */
-uint16_t gf_inverse(uint16_t a) {
+uint16_t hqcv5_256_gf_inverse(uint16_t a) {
     uint16_t inv = a;
     uint16_t tmp1, tmp2;
 
-    inv = gf_square(a);       /* a^2 */
-    tmp1 = gf_mul(inv, a);    /* a^3 */
-    inv = gf_square(inv);     /* a^4 */
-    tmp2 = gf_mul(inv, tmp1); /* a^7 */
-    tmp1 = gf_mul(inv, tmp2); /* a^11 */
-    inv = gf_mul(tmp1, inv);  /* a^15 */
-    inv = gf_square(inv);     /* a^30 */
-    inv = gf_square(inv);     /* a^60 */
-    inv = gf_square(inv);     /* a^120 */
-    inv = gf_mul(inv, tmp2);  /* a^127 */
-    inv = gf_square(inv);     /* a^254 */
+    inv = hqcv5_256_gf_square(a);       /* a^2 */
+    tmp1 = hqcv5_256_gf_mul(inv, a);    /* a^3 */
+    inv = hqcv5_256_gf_square(inv);     /* a^4 */
+    tmp2 = hqcv5_256_gf_mul(inv, tmp1); /* a^7 */
+    tmp1 = hqcv5_256_gf_mul(inv, tmp2); /* a^11 */
+    inv = hqcv5_256_gf_mul(tmp1, inv);  /* a^15 */
+    inv = hqcv5_256_gf_square(inv);     /* a^30 */
+    inv = hqcv5_256_gf_square(inv);     /* a^60 */
+    inv = hqcv5_256_gf_square(inv);     /* a^120 */
+    inv = hqcv5_256_gf_mul(inv, tmp2);  /* a^127 */
+    inv = hqcv5_256_gf_square(inv);     /* a^254 */
     return inv;
 }

@@ -74,11 +74,11 @@ void prng_get_bytes(uint8_t *output, uint32_t outlen);
 void xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size);
 void xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_t output_size);
 
-void hash_g(uint8_t *output, const uint8_t h_ek[SEED_BYTES], const uint8_t m[VEC_K_SIZE_BYTES],
-            const uint8_t salt[SALT_BYTES]);
-void hash_h(uint8_t *output, const uint8_t pk[PUBLIC_KEY_BYTES]);
+void hash_g(uint8_t *output, const uint8_t h_ek[hqcv5_256_SEED_BYTES], const uint8_t m[hqcv5_256_VEC_K_SIZE_BYTES],
+            const uint8_t salt[hqcv5_256_SALT_BYTES]);
+void hash_h(uint8_t *output, const uint8_t pk[hqcv5_256_PUBLIC_KEY_BYTES]);
 void hash_i(uint8_t *output, const uint8_t *seed);
-void hash_j(uint8_t *output, const uint8_t h_ek[SEED_BYTES], const uint8_t sigma[VEC_K_SIZE_BYTES],
-            const ciphertext_kem_t *c_kem);
+void hash_j(uint8_t *output, const uint8_t h_ek[hqcv5_256_SEED_BYTES], const uint8_t sigma[hqcv5_256_VEC_K_SIZE_BYTES],
+            const hqcv5_256_ciphertext_kem_t *c_kem);
 
 #endif  // HQC_SYMMETRIC_H

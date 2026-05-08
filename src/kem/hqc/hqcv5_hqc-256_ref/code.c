@@ -24,20 +24,20 @@
  * @param[out] em Pointer to an array that is a code word
  * @param[in] m Pointer to an array that is the message
  */
-void code_encode(uint64_t *em, const uint64_t *m) {
-    uint64_t tmp[VEC_N1_SIZE_64] = {0};
+void hqcv5_256_code_encode(uint64_t *em, const uint64_t *m) {
+    uint64_t tmp[hqcv5_256_VEC_N1_SIZE_64] = {0};
 
-    reed_solomon_encode(tmp, m);
-    reed_muller_encode(em, tmp);
+    hqcv5_256_reed_solomon_encode(tmp, m);
+    hqcv5_256_reed_muller_encode(em, tmp);
 
 #ifdef VERBOSE
     printf("\n\nReed-Solomon code word: ");
-    vect_print(tmp, VEC_N1_SIZE_BYTES);
+    hqcv5_256_vect_print(tmp, hqcv5_256_VEC_N1_SIZE_BYTES);
     printf("\n\nConcatenated code word: ");
-    vect_print(em, VEC_N1N2_SIZE_BYTES);
+    hqcv5_256_vect_print(em, hqcv5_256_VEC_N1N2_SIZE_BYTES);
 #endif
     // Zeroize sensitive data
-    memset_zero(tmp, sizeof tmp);
+    hqcv5_256_memset_zero(tmp, sizeof tmp);
 }
 
 /**
@@ -46,17 +46,17 @@ void code_encode(uint64_t *em, const uint64_t *m) {
  * @param[out] m Pointer to an array that is the message
  * @param[in] em Pointer to an array that is the code word
  */
-void code_decode(uint64_t *m, const uint64_t *em) {
-    uint64_t tmp[VEC_N1_SIZE_64] = {0};
+void hqcv5_256_code_decode(uint64_t *m, const uint64_t *em) {
+    uint64_t tmp[hqcv5_256_VEC_N1_SIZE_64] = {0};
 
-    reed_muller_decode(tmp, em);
-    reed_solomon_decode(m, tmp);
+    hqcv5_256_reed_muller_decode(tmp, em);
+    hqcv5_256_reed_solomon_decode(m, tmp);
 
 #ifdef VERBOSE
     printf("\n\nReed-Muller decoding result (the input for the Reed-Solomon decoding algorithm): ");
-    vect_print(tmp, VEC_N1_SIZE_BYTES);
+    hqcv5_256_vect_print(tmp, hqcv5_256_VEC_N1_SIZE_BYTES);
 #endif
 
     // Zeroize sensitive data
-    memset_zero(tmp, sizeof tmp);
+    hqcv5_256_memset_zero(tmp, sizeof tmp);
 }

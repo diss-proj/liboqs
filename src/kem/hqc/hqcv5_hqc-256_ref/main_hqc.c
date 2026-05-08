@@ -10,7 +10,7 @@
 #include "symmetric.h"
 #include "crypto_memset.h"
 
-static void init_randomness(void) {
+static void hqcv5_256_init_randomness(void) {
 
 #ifdef VERBOSE
     unsigned char entropy_input[48] = {0};
@@ -33,44 +33,44 @@ static void init_randomness(void) {
 
 int main(void) {
 
-    init_randomness();
+    hqcv5_256_init_randomness();
 
 #ifdef VERBOSE
     printf("\n*********\n");
     printf("  %s\n", CRYPTO_ALGNAME);
     printf("*********\n");
     printf("\n");
-    printf("N: %d   ", PARAM_N);
-    printf("N1: %d   ", PARAM_N1);
-    printf("N2: %d   ", PARAM_N2);
-    printf("OMEGA: %d   ", PARAM_OMEGA);
-    printf("OMEGA_R: %d   ", PARAM_OMEGA_R);
-    printf("Failure rate: 2^-%d   ", PARAM_DFR_EXP);
-    printf("Sec: %d bits", PARAM_SECURITY);
+    printf("N: %d   ", hqcv5_256_PARAM_N);
+    printf("N1: %d   ", hqcv5_256_PARAM_N1);
+    printf("N2: %d   ", hqcv5_256_PARAM_N2);
+    printf("OMEGA: %d   ", hqcv5_256_PARAM_OMEGA);
+    printf("OMEGA_R: %d   ", hqcv5_256_PARAM_OMEGA_R);
+    printf("Failure rate: 2^-%d   ", hqcv5_256_PARAM_DFR_EXP);
+    printf("Sec: %d bits", hqcv5_256_PARAM_SECURITY);
     printf("\n");
 #endif
 
-    unsigned char pk[PUBLIC_KEY_BYTES] = {0};
-    unsigned char sk[SECRET_KEY_BYTES] = {0};
-    unsigned char ct[CIPHERTEXT_BYTES] = {0};
-    unsigned char key1[SHARED_SECRET_BYTES] = {0};
-    unsigned char key2[SHARED_SECRET_BYTES] = {0};
+    unsigned char pk[hqcv5_256_PUBLIC_KEY_BYTES] = {0};
+    unsigned char sk[hqcv5_256_SECRET_KEY_BYTES] = {0};
+    unsigned char ct[hqcv5_256_CIPHERTEXT_BYTES] = {0};
+    unsigned char key1[hqcv5_256_SHARED_SECRET_BYTES] = {0};
+    unsigned char key2[hqcv5_256_SHARED_SECRET_BYTES] = {0};
 
-    crypto_kem_keypair(pk, sk);
-    crypto_kem_enc(ct, key1, pk);
-    crypto_kem_dec(key2, ct, sk);
+    hqcv5_256_crypto_kem_keypair(pk, sk);
+    hqcv5_256_crypto_kem_enc(ct, key1, pk);
+    hqcv5_256_crypto_kem_dec(key2, ct, sk);
 
     printf("\n\nsecret1: ");
-    for (int i = 0; i < SHARED_SECRET_BYTES; ++i) printf("%02x", key1[i]);
+    for (int i = 0; i < hqcv5_256_SHARED_SECRET_BYTES; ++i) printf("%02x", key1[i]);
 
     printf("\nsecret2: ");
-    for (int i = 0; i < SHARED_SECRET_BYTES; ++i) printf("%02x", key2[i]);
+    for (int i = 0; i < hqcv5_256_SHARED_SECRET_BYTES; ++i) printf("%02x", key2[i]);
     printf("\n\n");
 
     // Zeroize sensitive data
-    memset_zero(sk, sizeof sk);
-    memset_zero(key1, sizeof key1);
-    memset_zero(key2, sizeof key2);
+    hqcv5_256_memset_zero(sk, sizeof sk);
+    hqcv5_256_memset_zero(key1, sizeof key1);
+    hqcv5_256_memset_zero(key2, sizeof key2);
 
     return 0;
 }

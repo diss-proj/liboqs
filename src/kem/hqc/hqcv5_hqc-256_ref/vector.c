@@ -25,20 +25,20 @@ static inline uint32_t compare_u32(const uint32_t v1, const uint32_t v2) {
 }
 
 /**
- * @brief Constant-time Barrett reduction modulo PARAM_N.
+ * @brief Constant-time Barrett reduction modulo hqcv5_256_PARAM_N.
  *
- * Reduces \p x modulo PARAM_N using the precomputed value PARAM_N_MU = ⌊2^32 / PARAM_N⌋.
+ * Reduces \p x modulo hqcv5_256_PARAM_N using the precomputed value hqcv5_256_PARAM_N_MU = ⌊2^32 / hqcv5_256_PARAM_N⌋.
  *
- * @param[in] x Input value to reduce.
- * @return x mod PARAM_N in constant time.
+ * @param[in] x Input value to hqcv5_256_reduce.
+ * @return x mod hqcv5_256_PARAM_N in constant time.
  */
-static inline uint32_t barrett_reduce(uint32_t x) {
-    uint64_t q = ((uint64_t)x * PARAM_N_MU) >> 32;
-    uint32_t r = x - (uint32_t)(q * PARAM_N);
+static inline uint32_t hqcv5_256_barrett_reduce(uint32_t x) {
+    uint64_t q = ((uint64_t)x * hqcv5_256_PARAM_N_MU) >> 32;
+    uint32_t r = x - (uint32_t)(q * hqcv5_256_PARAM_N);
 
-    uint32_t reduce_flag = (((r - PARAM_N) >> 31) ^ 1);
+    uint32_t reduce_flag = (((r - hqcv5_256_PARAM_N) >> 31) ^ 1);
     uint32_t mask = -reduce_flag;
-    r -= mask & PARAM_N;
+    r -= mask & hqcv5_256_PARAM_N;
     return r;
 }
 
@@ -46,10 +46,10 @@ static inline uint32_t barrett_reduce(uint32_t x) {
  * @brief Generates a random support set with uniform and unbiased sampling.
  *
  * This function implements a rejection sampling algorithm to generate `weight`
- * distinct indices uniformly at random from the interval [0, PARAM_N).
+ * distinct indices uniformly at random from the interval [0, hqcv5_256_PARAM_N).
  * It ensures that the output is non-biased and the values are uniformly distributed.
  *
- * Internally, it samples 24-bit random values and rejects any value ≥ UTILS_REJECTION_THRESHOLD,
+ * Internally, it samples 24-bit random values and rejects any value ≥ hqcv5_256_UTILS_REJECTION_THRESHOLD,
  * where the threshold is precomputed as:
  * \f[
  * t = \left\lfloor \frac{2^{24}}{\text{PARAM\_N}} \right\rfloor \times \text{PARAM\_N}
@@ -59,9 +59,9 @@ static inline uint32_t barrett_reduce(uint32_t x) {
  * @param[out]    support Output array to store the `weight` unique indices.
  * @param[in]     weight  Desired Hamming weight.
  */
-void vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
+void hqcv5_256_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
     size_t random_bytes_size = 3 * weight;
-    uint8_t rand_bytes[3 * PARAM_OMEGA_R] = {0};
+    uint8_t rand_bytes[3 * hqcv5_256_PARAM_OMEGA_R] = {0};
     uint8_t inc;
     size_t i, j;
 
@@ -78,9 +78,9 @@ void vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *support, uin
             support[i] |= ((uint32_t)rand_bytes[j++]) << 8;
             support[i] |= rand_bytes[j++];
 
-        } while (support[i] >= UTILS_REJECTION_THRESHOLD);
+        } while (support[i] >= hqcv5_256_UTILS_REJECTION_THRESHOLD);
 
-        support[i] = barrett_reduce(support[i]);
+        support[i] = hqcv5_256_barrett_reduce(support[i]);
 
         inc = 1;
         for (size_t k = 0; k < i; k++) {
@@ -101,14 +101,14 @@ void vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *support, uin
  * @param[out]    support Output array of unique indices (the support set).
  * @param[in]     weight  Number of elements to generate (Hamming weight).
  */
-void vect_generate_random_support2(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
-    uint32_t rand_u32[PARAM_OMEGA_R] = {0};
+void hqcv5_256_vect_generate_random_support2(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
+    uint32_t rand_u32[hqcv5_256_PARAM_OMEGA_R] = {0};
 
     xof_get_bytes(ctx, (uint8_t *)&rand_u32, 4 * weight);
 
     for (size_t i = 0; i < weight; ++i) {
         uint64_t buff = rand_u32[i];
-        support[i] = i + ((buff * (PARAM_N - i)) >> 32);
+        support[i] = i + ((buff * (hqcv5_256_PARAM_N - i)) >> 32);
     }
 
     for (int32_t i = (weight - 1); i-- > 0;) {
@@ -133,9 +133,9 @@ void vect_generate_random_support2(shake256_xof_ctx *ctx, uint32_t *support, uin
  * @param[in]  support Array of bit indices to set.
  * @param[in]  weight  Number of positions to set.
  */
-void vect_write_support_to_vector(uint64_t *v, uint32_t *support, uint16_t weight) {
-    uint32_t index_tab[PARAM_OMEGA_R] = {0};
-    uint64_t bit_tab[PARAM_OMEGA_R] = {0};
+void hqcv5_256_vect_write_support_to_vector(uint64_t *v, uint32_t *support, uint16_t weight) {
+    uint32_t index_tab[hqcv5_256_PARAM_OMEGA_R] = {0};
+    uint64_t bit_tab[hqcv5_256_PARAM_OMEGA_R] = {0};
 
     for (size_t i = 0; i < weight; i++) {
         index_tab[i] = support[i] >> 6;
@@ -144,7 +144,7 @@ void vect_write_support_to_vector(uint64_t *v, uint32_t *support, uint16_t weigh
     }
 
     uint64_t val = 0;
-    for (uint32_t i = 0; i < VEC_N_SIZE_64; i++) {
+    for (uint32_t i = 0; i < hqcv5_256_VEC_N_SIZE_64; i++) {
         val = 0;
         for (uint32_t j = 0; j < weight; j++) {
             uint32_t tmp = i - index_tab[j];
@@ -166,15 +166,15 @@ void vect_write_support_to_vector(uint64_t *v, uint32_t *support, uint16_t weigh
  * the vectors **x** and **y**
  *
  * @param[in,out] ctx     Pointer to a previously initialized SHAKE-256 XOF context.
- * @param[out]    v       Pointer to an array of ⌈PARAM_N/64⌉ 64-bit words.
+ * @param[out]    v       Pointer to an array of ⌈hqcv5_256_PARAM_N/64⌉ 64-bit words.
  *                        On return, **v** is a bitmask with exactly `weight`
  *                        bits set to 1.
  * @param[in]     weight  Desired Hamming weight.
  */
-void vect_sample_fixed_weight1(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
-    uint32_t support[PARAM_OMEGA_R] = {0};
-    vect_generate_random_support1(ctx, support, weight);
-    vect_write_support_to_vector(v, support, weight);
+void hqcv5_256_vect_sample_fixed_weight1(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
+    uint32_t support[hqcv5_256_PARAM_OMEGA_R] = {0};
+    hqcv5_256_vect_generate_random_support1(ctx, support, weight);
+    hqcv5_256_vect_write_support_to_vector(v, support, weight);
 }
 
 /**
@@ -185,29 +185,29 @@ void vect_sample_fixed_weight1(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weig
  * the vectors **r1**, **r2**, and **e**.
  *
  * @param[in,out] ctx     Pointer to a previously initialized SHAKE-256 XOF context.
- * @param[out]    v       Pointer to an array of ⌈PARAM_N/64⌉ 64-bit words.
+ * @param[out]    v       Pointer to an array of ⌈hqcv5_256_PARAM_N/64⌉ 64-bit words.
  *                        On return, **v** is a mask with exactly **weight**
  *                        bits set to 1.
  * @param[in]     weight  Desired Hamming weight.
  */
-void vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
-    uint32_t support[PARAM_OMEGA_R] = {0};
-    vect_generate_random_support2(ctx, support, weight);
-    vect_write_support_to_vector(v, support, weight);
+void hqcv5_256_vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
+    uint32_t support[hqcv5_256_PARAM_OMEGA_R] = {0};
+    hqcv5_256_vect_generate_random_support2(ctx, support, weight);
+    hqcv5_256_vect_write_support_to_vector(v, support, weight);
 }
 
 /**
- * @brief Generates a random vector of dimension <b>PARAM_N</b>
+ * @brief Generates a random vector of dimension <b>hqcv5_256_PARAM_N</b>
  *
- * This function generates a random binary vector of dimension <b>PARAM_N</b>. It generates a random
+ * This function generates a random binary vector of dimension <b>hqcv5_256_PARAM_N</b>. It generates a random
  * array of bytes using the xof, and drop the extra bits using a mask.
  *
  * @param[in] ctx Pointer to the context of the xof
  * @param[in] v Pointer to an array
  */
-void vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
-    xof_get_bytes(ctx, (uint8_t *)v, VEC_N_SIZE_BYTES);
-    v[VEC_N_SIZE_64 - 1] &= BITMASK(PARAM_N, 64);
+void hqcv5_256_vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
+    xof_get_bytes(ctx, (uint8_t *)v, hqcv5_256_VEC_N_SIZE_BYTES);
+    v[hqcv5_256_VEC_N_SIZE_64 - 1] &= BITMASK(hqcv5_256_PARAM_N, 64);
 }
 
 /**
@@ -218,7 +218,7 @@ void vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
  * @param[in] v2 Pointer to an array that is the second vector
  * @param[in] size Integer that is the size of the vectors
  */
-void vect_add(uint64_t *o, const uint64_t *v1, const uint64_t *v2, uint32_t size) {
+void hqcv5_256_vect_add(uint64_t *o, const uint64_t *v1, const uint64_t *v2, uint32_t size) {
     for (uint32_t i = 0; i < size; ++i) {
         o[i] = v1[i] ^ v2[i];
     }
@@ -235,7 +235,7 @@ void vect_add(uint64_t *o, const uint64_t *v1, const uint64_t *v2, uint32_t size
  * @param[in] size Integer that is the size of the vectors
  * @returns 0 if the vectors are equals and 1 otherwise
  */
-uint8_t vect_compare(const uint8_t *v1, const uint8_t *v2, uint32_t size) {
+uint8_t hqcv5_256_vect_compare(const uint8_t *v1, const uint8_t *v2, uint32_t size) {
     uint16_t r = 0x0100;
 
     for (size_t i = 0; i < size; i++) {
@@ -246,15 +246,15 @@ uint8_t vect_compare(const uint8_t *v1, const uint8_t *v2, uint32_t size) {
 }
 
 /**
- * Truncate the bit-array v in-place to PARAM_N1N2 bits,
+ * Truncate the bit-array v in-place to hqcv5_256_PARAM_N1N2 bits,
  * zeroing out all bits beyond that.
  *
  * @param[in,out] v         Pointer to the uint64_t array containing the bits.
  */
-void vect_truncate(uint64_t *v) {
-    size_t orig_words = (PARAM_N + 63) / 64;
-    size_t new_full_words = PARAM_N1N2 / 64;
-    size_t remaining_bits = PARAM_N1N2 % 64;
+void hqcv5_256_vect_truncate(uint64_t *v) {
+    size_t orig_words = (hqcv5_256_PARAM_N + 63) / 64;
+    size_t new_full_words = hqcv5_256_PARAM_N1N2 / 64;
+    size_t remaining_bits = hqcv5_256_PARAM_N1N2 % 64;
 
     // Mask the last word if there's a partial word
     if (remaining_bits > 0) {
@@ -275,29 +275,29 @@ void vect_truncate(uint64_t *v) {
  * @param[in] v Pointer to an array of bytes
  * @param[in] size Integer that is number of bytes to be displayed
  */
-void vect_print(const uint64_t *v, const uint32_t size) {
-    if (size == VEC_K_SIZE_BYTES) {
-        uint8_t tmp[VEC_K_SIZE_BYTES] = {0};
-        memcpy(tmp, v, VEC_K_SIZE_BYTES);
-        for (uint32_t i = 0; i < VEC_K_SIZE_BYTES; ++i) {
+void hqcv5_256_vect_print(const uint64_t *v, const uint32_t size) {
+    if (size == hqcv5_256_VEC_K_SIZE_BYTES) {
+        uint8_t tmp[hqcv5_256_VEC_K_SIZE_BYTES] = {0};
+        memcpy(tmp, v, hqcv5_256_VEC_K_SIZE_BYTES);
+        for (uint32_t i = 0; i < hqcv5_256_VEC_K_SIZE_BYTES; ++i) {
             printf("%02x", tmp[i]);
         }
-    } else if (size == VEC_N_SIZE_BYTES) {
-        uint8_t tmp[VEC_N_SIZE_BYTES] = {0};
-        memcpy(tmp, v, VEC_N_SIZE_BYTES);
-        for (uint32_t i = 0; i < VEC_N_SIZE_BYTES; ++i) {
+    } else if (size == hqcv5_256_VEC_N_SIZE_BYTES) {
+        uint8_t tmp[hqcv5_256_VEC_N_SIZE_BYTES] = {0};
+        memcpy(tmp, v, hqcv5_256_VEC_N_SIZE_BYTES);
+        for (uint32_t i = 0; i < hqcv5_256_VEC_N_SIZE_BYTES; ++i) {
             printf("%02x", tmp[i]);
         }
-    } else if (size == VEC_N1N2_SIZE_BYTES) {
-        uint8_t tmp[VEC_N1N2_SIZE_BYTES] = {0};
-        memcpy(tmp, v, VEC_N1N2_SIZE_BYTES);
-        for (uint32_t i = 0; i < VEC_N1N2_SIZE_BYTES; ++i) {
+    } else if (size == hqcv5_256_VEC_N1N2_SIZE_BYTES) {
+        uint8_t tmp[hqcv5_256_VEC_N1N2_SIZE_BYTES] = {0};
+        memcpy(tmp, v, hqcv5_256_VEC_N1N2_SIZE_BYTES);
+        for (uint32_t i = 0; i < hqcv5_256_VEC_N1N2_SIZE_BYTES; ++i) {
             printf("%02x", tmp[i]);
         }
-    } else if (size == VEC_N1_SIZE_BYTES) {
-        uint8_t tmp[VEC_N1_SIZE_BYTES] = {0};
-        memcpy(tmp, v, VEC_N1_SIZE_BYTES);
-        for (uint32_t i = 0; i < VEC_N1_SIZE_BYTES; ++i) {
+    } else if (size == hqcv5_256_VEC_N1_SIZE_BYTES) {
+        uint8_t tmp[hqcv5_256_VEC_N1_SIZE_BYTES] = {0};
+        memcpy(tmp, v, hqcv5_256_VEC_N1_SIZE_BYTES);
+        for (uint32_t i = 0; i < hqcv5_256_VEC_N1_SIZE_BYTES; ++i) {
             printf("%02x", tmp[i]);
         }
     }

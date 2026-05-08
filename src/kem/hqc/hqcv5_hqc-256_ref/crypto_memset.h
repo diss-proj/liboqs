@@ -3,8 +3,8 @@
  * @brief Header file for crypto_memset.c
  */
 
-#ifndef HQC_CRYPTO_MEMSET_H
-#define HQC_CRYPTO_MEMSET_H
+#ifndef hqcv5_256_HQC_CRYPTO_MEMSET_H
+#define hqcv5_256_HQC_CRYPTO_MEMSET_H
 
 #include <stddef.h>
 
@@ -14,9 +14,9 @@
 extern void *(*volatile memset_volatile)(void *, int, size_t);
 
 /**
- * @def memset_zero
+ * @def hqcv5_256_memset_zero
  * @brief Securely zero a memory region.
  */
-#define memset_zero(ptr, len) memset_volatile((ptr), 0, (len))
+#define hqcv5_256_memset_zero(ptr, len) memset_volatile((ptr), 0, (len))
 
-#endif  // HQC_CRYPTO_MEMSET_H
+#endif  // hqcv5_256_HQC_CRYPTO_MEMSET_H
