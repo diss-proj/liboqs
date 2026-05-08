@@ -52,7 +52,7 @@ void prng_get_bytes(uint8_t *output, uint32_t outlen) {
  * @param[in]  seed      Pointer to the input seed.
  * @param[in]  seed_size Size of the seed in bytes.
  */
-void xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size) {
+void hqcv5_192_xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size) {
     uint8_t xof_domain = HQC_XOF_DOMAIN;
     shake256_inc_init(xof_ctx);
     shake256_inc_absorb(xof_ctx, seed, seed_size);
@@ -69,7 +69,7 @@ void xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size
  *
  * @details This function squeezes the specified number of pseudorandom bytes from
  * the SHAKE256 XOF context and stores them in the provided output buffer.
- * The context must have been initialized beforehand using `xof_init()`.
+ * The context must have been initialized beforehand using `hqcv5_192_xof_init()`.
  */
 void xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_t output_size) {
     const uint8_t bsize = sizeof(uint64_t);
@@ -94,11 +94,11 @@ void xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_t output_s
  * @details This function implements the random oracle `I` as specified,
  * using the SHA3-512 hash function. It produces a 64-byte output from the given seed.
  */
-void hash_i(uint8_t *output, const uint8_t *seed) {
+void hqcv5_192_hash_i(uint8_t *output, const uint8_t *seed) {
     sha3_512_ctx i_hash_ctx = {0};
     uint8_t i_domain = HQC_I_FCT_DOMAIN;
     sha3_512_inc_init(&i_hash_ctx);
-    sha3_512_inc_absorb(&i_hash_ctx, seed, SEED_BYTES);
+    sha3_512_inc_absorb(&i_hash_ctx, seed, hqcv5_192_SEED_BYTES);
     sha3_512_inc_absorb(&i_hash_ctx, &i_domain, 1);
     sha3_512_inc_finalize(output, &i_hash_ctx);
 }
@@ -109,11 +109,11 @@ void hash_i(uint8_t *output, const uint8_t *seed) {
  * @param[out] output      Buffer (32 bytes) to receive the hash output.
  * @param[in]  ek_kem      Encapsulation key of the KEM.
  */
-void hash_h(uint8_t *output, const uint8_t ek_kem[PUBLIC_KEY_BYTES]) {
+void hash_h(uint8_t *output, const uint8_t ek_kem[hqcv5_192_PUBLIC_KEY_BYTES]) {
     sha3_256_ctx h_hash_ctx = {0};
     uint8_t h_domain = HQC_H_FCT_DOMAIN;
     sha3_256_inc_init(&h_hash_ctx);
-    sha3_256_inc_absorb(&h_hash_ctx, ek_kem, PUBLIC_KEY_BYTES);
+    sha3_256_inc_absorb(&h_hash_ctx, ek_kem, hqcv5_192_PUBLIC_KEY_BYTES);
     sha3_256_inc_absorb(&h_hash_ctx, &h_domain, 1);
     sha3_256_inc_finalize(output, &h_hash_ctx);
 }
@@ -126,14 +126,14 @@ void hash_h(uint8_t *output, const uint8_t ek_kem[PUBLIC_KEY_BYTES]) {
  * @param[in]  m             Message bytes.
  * @param[in]  salt          Salt value.
  */
-void hash_g(uint8_t *output, const uint8_t hash_ek_kem[SEED_BYTES], const uint8_t m[PARAM_SECURITY_BYTES],
-            const uint8_t salt[SALT_BYTES]) {
+void hash_g(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_192_SEED_BYTES], const uint8_t m[hqcv5_192_PARAM_SECURITY_BYTES],
+            const uint8_t salt[hqcv5_192_SALT_BYTES]) {
     sha3_512_ctx g_hash_ctx = {0};
     uint8_t i_domain = HQC_G_FCT_DOMAIN;
     sha3_512_inc_init(&g_hash_ctx);
-    sha3_512_inc_absorb(&g_hash_ctx, hash_ek_kem, SEED_BYTES);
-    sha3_512_inc_absorb(&g_hash_ctx, m, PARAM_SECURITY_BYTES);
-    sha3_512_inc_absorb(&g_hash_ctx, salt, SALT_BYTES);
+    sha3_512_inc_absorb(&g_hash_ctx, hash_ek_kem, hqcv5_192_SEED_BYTES);
+    sha3_512_inc_absorb(&g_hash_ctx, m, hqcv5_192_PARAM_SECURITY_BYTES);
+    sha3_512_inc_absorb(&g_hash_ctx, salt, hqcv5_192_SALT_BYTES);
     sha3_512_inc_absorb(&g_hash_ctx, &i_domain, 1);
     sha3_512_inc_finalize(output, &g_hash_ctx);
 }
@@ -146,16 +146,16 @@ void hash_g(uint8_t *output, const uint8_t hash_ek_kem[SEED_BYTES], const uint8_
  * @param[in]  sigma        The string sigma.
  * @param[in]  c_kem        Pointer to ciphertext struct (includes c_pke.u, c_pke.v, and salt).
  */
-void hash_j(uint8_t *output, const uint8_t hash_ek_kem[SEED_BYTES], const uint8_t sigma[PARAM_SECURITY_BYTES],
-            const ciphertext_kem_t *c_kem) {
+void hash_j(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_192_SEED_BYTES], const uint8_t sigma[hqcv5_192_PARAM_SECURITY_BYTES],
+            const hqcv5_192_ciphertext_kem_t *c_kem) {
     sha3_256_ctx k_hash_ctx = {0};
     uint8_t k_domain = HQC_J_FCT_DOMAIN;
     sha3_256_inc_init(&k_hash_ctx);
-    sha3_256_inc_absorb(&k_hash_ctx, hash_ek_kem, SEED_BYTES);
-    sha3_256_inc_absorb(&k_hash_ctx, sigma, PARAM_SECURITY_BYTES);
-    sha3_256_inc_absorb(&k_hash_ctx, (uint8_t *)c_kem->c_pke.u, VEC_N_SIZE_BYTES);
-    sha3_256_inc_absorb(&k_hash_ctx, (uint8_t *)c_kem->c_pke.v, VEC_N1N2_SIZE_BYTES);
-    sha3_256_inc_absorb(&k_hash_ctx, c_kem->salt, SALT_BYTES);
+    sha3_256_inc_absorb(&k_hash_ctx, hash_ek_kem, hqcv5_192_SEED_BYTES);
+    sha3_256_inc_absorb(&k_hash_ctx, sigma, hqcv5_192_PARAM_SECURITY_BYTES);
+    sha3_256_inc_absorb(&k_hash_ctx, (uint8_t *)c_kem->c_pke.u, hqcv5_192_VEC_N_SIZE_BYTES);
+    sha3_256_inc_absorb(&k_hash_ctx, (uint8_t *)c_kem->c_pke.v, hqcv5_192_VEC_N1N2_SIZE_BYTES);
+    sha3_256_inc_absorb(&k_hash_ctx, c_kem->salt, hqcv5_192_SALT_BYTES);
     sha3_256_inc_absorb(&k_hash_ctx, &k_domain, 1);
     sha3_256_inc_finalize(output, &k_hash_ctx);
 }

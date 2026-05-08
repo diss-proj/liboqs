@@ -38,35 +38,35 @@ typedef sha3_256incctx sha3_256_ctx;
  */
 typedef shake256incctx shake256_xof_ctx;
 
-/** @def hqcv5_128_HQC_PRNG_DOMAIN
+/** @def HQC_PRNG_DOMAIN
  *  @brief Domain separator for HQC prng function.
  */
-#define hqcv5_128_HQC_PRNG_DOMAIN 0
+#define HQC_PRNG_DOMAIN 0
 
-/** @def hqcv5_128_HQC_XOF_DOMAIN
+/** @def HQC_XOF_DOMAIN
  *  @brief Domain separator for HQC extendable-output function.
  */
-#define hqcv5_128_HQC_XOF_DOMAIN 1
+#define HQC_XOF_DOMAIN 1
 
-/** @def hqcv5_128_HQC_G_FCT_DOMAIN
+/** @def HQC_G_FCT_DOMAIN
  *  @brief Domain separator for the G(·) function in HQC.
  */
-#define hqcv5_128_HQC_G_FCT_DOMAIN 0
+#define HQC_G_FCT_DOMAIN 0
 
-/** @def hqcv5_128_HQC_H_FCT_DOMAIN
+/** @def HQC_H_FCT_DOMAIN
  *  @brief Domain separator for the H(·) function in HQC.
  */
-#define hqcv5_128_HQC_H_FCT_DOMAIN 1
+#define HQC_H_FCT_DOMAIN 1
 
-/** @def hqcv5_128_HQC_I_FCT_DOMAIN
+/** @def HQC_I_FCT_DOMAIN
  *  @brief Domain separator for the I(·) function in HQC.
  */
-#define hqcv5_128_HQC_I_FCT_DOMAIN 2
+#define HQC_I_FCT_DOMAIN 2
 
-/** @def hqcv5_128_HQC_J_FCT_DOMAIN
+/** @def HQC_J_FCT_DOMAIN
  *  @brief Domain separator for the J(·) function in HQC.
  */
-#define hqcv5_128_HQC_J_FCT_DOMAIN 3
+#define HQC_J_FCT_DOMAIN 3
 
 void prng_init(uint8_t *entropy_input, uint8_t *personalization_string, uint32_t enlen, uint32_t perlen);
 void prng_get_bytes(uint8_t *output, uint32_t outlen);

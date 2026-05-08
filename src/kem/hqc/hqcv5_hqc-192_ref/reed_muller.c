@@ -12,16 +12,16 @@
 /**
  * @brief Number of repeated 128-bit codeword blocks.
  *
- * Calculates the ceiling of PARAM_N2/128 to determine how many
+ * Calculates the ceiling of hqcv5_192_PARAM_N2/128 to determine how many
  * copies of each 128-bit codeword are used in the code expansion.
  */
-#define MULTIPLICITY CEIL_DIVIDE(PARAM_N2, 128)
+#define hqcv5_192_MULTIPLICITY CEIL_DIVIDE(hqcv5_192_PARAM_N2, 128)
 
 /**
- * @typedef rm_expanded_cdw
+ * @typedef hqcv5_192_rm_expanded_cdw
  * @brief Internal representation of a codeword with each bit expanded to a 16-bit signed value.
  */
-typedef int16_t rm_expanded_cdw[128];
+typedef int16_t hqcv5_192_rm_expanded_cdw[128];
 
 // clang-format off
 /**
@@ -34,10 +34,10 @@ typedef int16_t rm_expanded_cdw[128];
 #define BIT0MASK(x) (int32_t)(-((x) & 1))
 // clang-format on
 
-void encode(rm_codeword_t *word, int32_t message);
-void hadamard(rm_expanded_cdw *src, rm_expanded_cdw *dst);
-void expand_and_sum(rm_expanded_cdw *dest, rm_codeword_t src[]);
-int32_t find_peaks(rm_expanded_cdw *transform);
+void hqcv5_192_encode(hqcv5_192_rm_codeword_t *word, int32_t message);
+void hqcv5_192_hadamard(hqcv5_192_rm_expanded_cdw *src, hqcv5_192_rm_expanded_cdw *dst);
+void hqcv5_192_expand_and_sum(hqcv5_192_rm_expanded_cdw *dest, hqcv5_192_rm_codeword_t src[]);
+int32_t hqcv5_192_find_peaks(hqcv5_192_rm_expanded_cdw *transform);
 
 /**
  * @brief Encode a single byte into a single codeword using RM(1,7)
@@ -56,7 +56,7 @@ int32_t find_peaks(rm_expanded_cdw *transform);
  * @param[out] word An RM(1,7) codeword
  * @param[in] message A message
  */
-void encode(rm_codeword_t *word, int32_t message) {
+void hqcv5_192_encode(hqcv5_192_rm_codeword_t *word, int32_t message) {
     int32_t first_word;
 
     first_word = BIT0MASK(message >> 7);
@@ -87,19 +87,19 @@ void encode(rm_codeword_t *word, int32_t message) {
  * @param[out] src Structure that contain the expanded codeword
  * @param[out] dst Structure that contain the expanded codeword
  */
-void hadamard(rm_expanded_cdw *src, rm_expanded_cdw *dst) {
+void hqcv5_192_hadamard(hqcv5_192_rm_expanded_cdw *src, hqcv5_192_rm_expanded_cdw *dst) {
     // the passes move data:
     // src -> dst -> src -> dst -> src -> dst -> src -> dst
     // using p1 and p2 alternately
-    rm_expanded_cdw *p1 = src;
-    rm_expanded_cdw *p2 = dst;
+    hqcv5_192_rm_expanded_cdw *p1 = src;
+    hqcv5_192_rm_expanded_cdw *p2 = dst;
     for (int32_t pass = 0; pass < 7; pass++) {
         for (int32_t i = 0; i < 64; i++) {
             (*p2)[i] = (*p1)[2 * i] + (*p1)[2 * i + 1];
             (*p2)[i + 64] = (*p1)[2 * i] - (*p1)[2 * i + 1];
         }
         // swap p1, p2 for next round
-        rm_expanded_cdw *p3 = p1;
+        hqcv5_192_rm_expanded_cdw *p3 = p1;
         p1 = p2;
         p2 = p3;
     }
@@ -118,7 +118,7 @@ void hadamard(rm_expanded_cdw *src, rm_expanded_cdw *dst) {
  * @param[out] dest Structure that contain the expanded codeword
  * @param[in] src Structure that contain the codeword
  */
-void expand_and_sum(rm_expanded_cdw *dest, rm_codeword_t src[]) {
+void hqcv5_192_expand_and_sum(hqcv5_192_rm_expanded_cdw *dest, hqcv5_192_rm_codeword_t src[]) {
     // start with the first copy
     for (int32_t part = 0; part < 4; part++) {
         for (int32_t bit = 0; bit < 32; bit++) {
@@ -126,7 +126,7 @@ void expand_and_sum(rm_expanded_cdw *dest, rm_codeword_t src[]) {
         }
     }
     // sum the rest of the copies
-    for (int32_t copy = 1; copy < MULTIPLICITY; copy++) {
+    for (int32_t copy = 1; copy < hqcv5_192_MULTIPLICITY; copy++) {
         for (int32_t part = 0; part < 4; part++) {
             for (int32_t bit = 0; bit < 32; bit++) {
                 (*dest)[part * 32 + bit] += src[copy].u32[part] >> bit & 1;
@@ -144,7 +144,7 @@ void expand_and_sum(rm_expanded_cdw *dest, rm_codeword_t src[]) {
  * in the lowest 7 bits it taken
  * @param[in] transform Structure that contain the expanded codeword
  */
-int32_t find_peaks(rm_expanded_cdw *transform) {
+int32_t hqcv5_192_find_peaks(hqcv5_192_rm_expanded_cdw *transform) {
     int32_t peak_abs_value = 0;
     int32_t peak_value = 0;
     int32_t peak_pos = 0;
@@ -165,23 +165,23 @@ int32_t find_peaks(rm_expanded_cdw *transform) {
 /**
  * @brief Encodes the received word
  *
- * The message consists of N1 bytes each byte is encoded into PARAM_N2 bits,
- * or MULTIPLICITY repeats of 128 bits
+ * The message consists of N1 bytes each byte is encoded into hqcv5_192_PARAM_N2 bits,
+ * or hqcv5_192_MULTIPLICITY repeats of 128 bits
  *
- * @param[out] cdw Array of size VEC_N1N2_SIZE_64 receiving the encoded message
- * @param[in] msg Array of size VEC_N1_SIZE_64 storing the message
+ * @param[out] cdw Array of size hqcv5_192_VEC_N1N2_SIZE_64 receiving the encoded message
+ * @param[in] msg Array of size hqcv5_192_VEC_N1_SIZE_64 storing the message
  */
-void reed_muller_encode(uint64_t *cdw, const uint64_t *msg) {
+void hqcv5_192_reed_muller_encode(uint64_t *cdw, const uint64_t *msg) {
     uint8_t *message_array = (uint8_t *)msg;
-    rm_codeword_t *codeArray = (rm_codeword_t *)cdw;
-    for (size_t i = 0; i < VEC_N1_SIZE_BYTES; i++) {
-        // fill entries i * MULTIPLICITY to (i+1) * MULTIPLICITY
-        int32_t pos = i * MULTIPLICITY;
+    hqcv5_192_rm_codeword_t *codeArray = (hqcv5_192_rm_codeword_t *)cdw;
+    for (size_t i = 0; i < hqcv5_192_VEC_N1_SIZE_BYTES; i++) {
+        // fill entries i * hqcv5_192_MULTIPLICITY to (i+1) * hqcv5_192_MULTIPLICITY
+        int32_t pos = i * hqcv5_192_MULTIPLICITY;
         // encode first word
-        encode(&codeArray[pos], message_array[i]);
+        hqcv5_192_encode(&codeArray[pos], message_array[i]);
         // copy to other identical codewords
-        for (size_t copy = 1; copy < MULTIPLICITY; copy++) {
-            memcpy(&codeArray[pos + copy], &codeArray[pos], sizeof(rm_codeword_t));
+        for (size_t copy = 1; copy < hqcv5_192_MULTIPLICITY; copy++) {
+            memcpy(&codeArray[pos + copy], &codeArray[pos], sizeof(hqcv5_192_rm_codeword_t));
         }
     }
 }
@@ -192,22 +192,22 @@ void reed_muller_encode(uint64_t *cdw, const uint64_t *msg) {
  * Decoding uses fast hadamard transform, for a more complete picture on Reed-Muller decoding, see MacWilliams, Florence
  * Jessie, and Neil James Alexander Sloane. The theory of error-correcting codes codes @cite macwilliams1977theory
  *
- * @param[out] msg Array of size VEC_N1_SIZE_64 receiving the decoded message
- * @param[in] cdw Array of size VEC_N1N2_SIZE_64 storing the received word
+ * @param[out] msg Array of size hqcv5_192_VEC_N1_SIZE_64 receiving the decoded message
+ * @param[in] cdw Array of size hqcv5_192_VEC_N1N2_SIZE_64 storing the received word
  */
-void reed_muller_decode(uint64_t *msg, const uint64_t *cdw) {
+void hqcv5_192_reed_muller_decode(uint64_t *msg, const uint64_t *cdw) {
     uint8_t *message_array = (uint8_t *)msg;
-    rm_codeword_t *codeArray = (rm_codeword_t *)cdw;
-    rm_expanded_cdw expanded;
-    for (size_t i = 0; i < VEC_N1_SIZE_BYTES; i++) {
+    hqcv5_192_rm_codeword_t *codeArray = (hqcv5_192_rm_codeword_t *)cdw;
+    hqcv5_192_rm_expanded_cdw expanded;
+    for (size_t i = 0; i < hqcv5_192_VEC_N1_SIZE_BYTES; i++) {
         // collect the codewords
-        expand_and_sum(&expanded, &codeArray[i * MULTIPLICITY]);
+        hqcv5_192_expand_and_sum(&expanded, &codeArray[i * hqcv5_192_MULTIPLICITY]);
         // apply hadamard transform
-        rm_expanded_cdw transform;
-        hadamard(&expanded, &transform);
+        hqcv5_192_rm_expanded_cdw transform;
+        hqcv5_192_hadamard(&expanded, &transform);
         // fix the first entry to get the half Hadamard transform
-        transform[0] -= 64 * MULTIPLICITY;
+        transform[0] -= 64 * hqcv5_192_MULTIPLICITY;
         // finish the decoding
-        message_array[i] = find_peaks(&transform);
+        message_array[i] = hqcv5_192_find_peaks(&transform);
     }
 }

@@ -3,14 +3,14 @@
  * @brief Header file of reed_muller.c
  */
 
-#ifndef HQC_REED_MULLER_H
-#define HQC_REED_MULLER_H
+#ifndef hqcv5_192_HQC_REED_MULLER_H
+#define hqcv5_192_HQC_REED_MULLER_H
 
 #include <stddef.h>
 #include <stdint.h>
 #include "parameters.h"
 
-void reed_muller_encode(uint64_t* cdw, const uint64_t* msg);
-void reed_muller_decode(uint64_t* msg, const uint64_t* cdw);
+void hqcv5_192_reed_muller_encode(uint64_t* cdw, const uint64_t* msg);
+void hqcv5_192_reed_muller_decode(uint64_t* msg, const uint64_t* cdw);
 
-#endif  // HQC_REED_MULLER_H
+#endif  // hqcv5_192_HQC_REED_MULLER_H
