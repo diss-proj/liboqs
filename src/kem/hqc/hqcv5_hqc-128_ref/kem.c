@@ -13,9 +13,9 @@
 #include "symmetric.h"
 #include "vector.h"
 
-// #ifdef VERBOSE
+#ifdef VERBOSE
 #include <stdio.h>
-// #endif
+#endif
 
 /**
  * @brief Generates a keypair for the KEM (Key Encapsulation Mechanism) scheme.
@@ -40,7 +40,6 @@ int hqcv5_128_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
 #ifdef VERBOSE
     printf("\n\n\n### KEYGEN ###");
 #endif
-    printf("hqcv5_128_PUBLIC_KEY_BYTES: %d", hqcv5_128_PUBLIC_KEY_BYTES);
     uint8_t seed_kem[hqcv5_128_SEED_BYTES] = {0};
     uint8_t sigma[hqcv5_128_PARAM_SECURITY_BYTES] = {0};
     uint8_t seed_pke[hqcv5_128_SEED_BYTES] = {0};
