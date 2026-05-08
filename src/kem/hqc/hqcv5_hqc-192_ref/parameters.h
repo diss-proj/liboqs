@@ -22,10 +22,10 @@
 #define PARAM_SECURITY_BYTES        24          ///< Define the security level in bytes
 #define PARAM_DFR_EXP               192         ///< Define the decryption failure rate corresponding to the chosen parameters
 
-#define SECRET_KEY_BYTES            CRYPTO_SECRETKEYBYTES   ///< Define the size of the secret key in bytes
-#define PUBLIC_KEY_BYTES            CRYPTO_PUBLICKEYBYTES   ///< Define the size of the public key in bytes
-#define SHARED_SECRET_BYTES         CRYPTO_BYTES            ///< Define the size of the shared secret in bytes
-#define CIPHERTEXT_BYTES            CRYPTO_CIPHERTEXTBYTES  ///< Define the size of the ciphertext in bytes
+#define SECRET_KEY_BYTES            hqcv5_192_CRYPTO_SECRETKEYBYTES   ///< Define the size of the secret key in bytes
+#define PUBLIC_KEY_BYTES            hqcv5_192_CRYPTO_PUBLICKEYBYTES   ///< Define the size of the public key in bytes
+#define SHARED_SECRET_BYTES         hqcv5_192_CRYPTO_BYTES            ///< Define the size of the shared secret in bytes
+#define CIPHERTEXT_BYTES            hqcv5_192_CRYPTO_CIPHERTEXTBYTES  ///< Define the size of the ciphertext in bytes
 
 #define VEC_N_SIZE_BYTES            CEIL_DIVIDE(PARAM_N, 8)     ///< Size of array to store PARAM_N bits in bytes
 #define VEC_K_SIZE_BYTES            PARAM_K                     ///< Size of array to store PARAM_K bits in bytes

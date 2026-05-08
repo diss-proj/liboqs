@@ -28,22 +28,22 @@ int main(void) {
     FILE *fp_req, *fp_rsp;
     unsigned char seed[48] = {0};
     unsigned char entropy_input[48] = {0};
-    unsigned char ct[CRYPTO_CIPHERTEXTBYTES] = {0};
-    unsigned char ss[CRYPTO_BYTES] = {0};
-    unsigned char ss1[CRYPTO_BYTES] = {0};
+    unsigned char ct[hqcv5_192_CRYPTO_CIPHERTEXTBYTES] = {0};
+    unsigned char ss[hqcv5_192_CRYPTO_BYTES] = {0};
+    unsigned char ss1[hqcv5_192_CRYPTO_BYTES] = {0};
     int count;
     int done;
-    unsigned char pk[CRYPTO_PUBLICKEYBYTES] = {0};
-    unsigned char sk[CRYPTO_SECRETKEYBYTES] = {0};
+    unsigned char pk[hqcv5_192_CRYPTO_PUBLICKEYBYTES] = {0};
+    unsigned char sk[hqcv5_192_CRYPTO_SECRETKEYBYTES] = {0};
     int ret_val;
 
     // Create the REQUEST file
-    sprintf(fn_req, "PQCkemKAT_%d.req", CRYPTO_SECRETKEYBYTES);
+    sprintf(fn_req, "PQCkemKAT_%d.req", hqcv5_192_CRYPTO_SECRETKEYBYTES);
     if ((fp_req = fopen(fn_req, "w")) == NULL) {
         printf("Couldn't open <%s> for write\n", fn_req);
         return KAT_FILE_OPEN_ERROR;
     }
-    sprintf(fn_rsp, "PQCkemKAT_%d.rsp", CRYPTO_SECRETKEYBYTES);
+    sprintf(fn_rsp, "PQCkemKAT_%d.rsp", hqcv5_192_CRYPTO_SECRETKEYBYTES);
     if ((fp_rsp = fopen(fn_rsp, "w")) == NULL) {
         printf("Couldn't open <%s> for write\n", fn_rsp);
         return KAT_FILE_OPEN_ERROR;
@@ -93,15 +93,15 @@ int main(void) {
             printf("crypto_kem_keypair returned <%d>\n", ret_val);
             return KAT_CRYPTO_FAILURE;
         }
-        fprintBstr(fp_rsp, "pk = ", pk, CRYPTO_PUBLICKEYBYTES);
-        fprintBstr(fp_rsp, "sk = ", sk, CRYPTO_SECRETKEYBYTES);
+        fprintBstr(fp_rsp, "pk = ", pk, hqcv5_192_CRYPTO_PUBLICKEYBYTES);
+        fprintBstr(fp_rsp, "sk = ", sk, hqcv5_192_CRYPTO_SECRETKEYBYTES);
 
         if ((ret_val = crypto_kem_enc(ct, ss, pk)) != 0) {
             printf("crypto_kem_enc returned <%d>\n", ret_val);
             return KAT_CRYPTO_FAILURE;
         }
-        fprintBstr(fp_rsp, "ct = ", ct, CRYPTO_CIPHERTEXTBYTES);
-        fprintBstr(fp_rsp, "ss = ", ss, CRYPTO_BYTES);
+        fprintBstr(fp_rsp, "ct = ", ct, hqcv5_192_CRYPTO_CIPHERTEXTBYTES);
+        fprintBstr(fp_rsp, "ss = ", ss, hqcv5_192_CRYPTO_BYTES);
 
         fprintf(fp_rsp, "\n");
 
@@ -110,7 +110,7 @@ int main(void) {
             return KAT_CRYPTO_FAILURE;
         }
 
-        if (memcmp(ss, ss1, CRYPTO_BYTES)) {
+        if (memcmp(ss, ss1, hqcv5_192_CRYPTO_BYTES)) {
             printf("crypto_kem_dec returned bad 'ss' value\n");
             return KAT_CRYPTO_FAILURE;
         }
