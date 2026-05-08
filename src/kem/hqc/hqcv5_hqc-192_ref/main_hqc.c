@@ -15,7 +15,7 @@ static void hqcv5_192_init_randomness(void) {
 #ifdef VERBOSE
     unsigned char entropy_input[48] = {0};
     for (int i = 0; i < 48; i++) entropy_input[i] = (unsigned char)i;
-    prng_init(entropy_input, NULL, sizeof entropy_input, 0);
+    hqcv5_192_prng_init(entropy_input, NULL, sizeof entropy_input, 0);
 #else
     unsigned char seed[32] = {0};
     size_t filled = 0;
@@ -27,7 +27,7 @@ static void hqcv5_192_init_randomness(void) {
         }
         filled += (size_t)got;
     }
-    prng_init(seed, NULL, sizeof seed, 0);
+    hqcv5_192_prng_init(seed, NULL, sizeof seed, 0);
 #endif
 }
 

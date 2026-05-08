@@ -29,12 +29,12 @@
  *
  * @return 0 on success.
  *
- * @pre The PRNG **must be seeded** with ::prng_init() before calling this function.
- * @warning This function calls ::prng_get_bytes() to sample `seed_kem`. If the PRNG has not been
+ * @pre The PRNG **must be seeded** with ::hqcv5_256_prng_init() before calling this function.
+ * @warning This function calls ::hqcv5_256_prng_get_bytes() to sample `seed_kem`. If the PRNG has not been
  *          properly seeded beforehand, the generated keys will be insecure/predictable.
  * @note An example of correct seeding is provided in `main_hqc.c` (see `hqcv5_256_init_randomness()`), which
  *       seeds the PRNG using `syscall(SYS_getrandom, ...)` (32 bytes) by default..
- * @see prng_init, prng_get_bytes, main_hqc.c
+ * @see hqcv5_256_prng_init, hqcv5_256_prng_get_bytes, main_hqc.c
  */
 int hqcv5_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
 #ifdef VERBOSE
@@ -43,18 +43,18 @@ int hqcv5_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
     uint8_t seed_kem[hqcv5_256_SEED_BYTES] = {0};
     uint8_t sigma[hqcv5_256_PARAM_SECURITY_BYTES] = {0};
     uint8_t seed_pke[hqcv5_256_SEED_BYTES] = {0};
-    shake256_xof_ctx ctx_kem;
+    hqcv5_256_shake256_xof_ctx ctx_kem;
 
     uint8_t ek_pke[hqcv5_256_PUBLIC_KEY_BYTES] = {0};
     uint8_t dk_pke[hqcv5_256_SEED_BYTES] = {0};
 
     // Sample seed_kem
-    prng_get_bytes(seed_kem, hqcv5_256_SEED_BYTES);
+    hqcv5_256_prng_get_bytes(seed_kem, hqcv5_256_SEED_BYTES);
 
     // Compute seed_pke and randomness sigma
-    xof_init(&ctx_kem, seed_kem, hqcv5_256_SEED_BYTES);
-    xof_get_bytes(&ctx_kem, seed_pke, hqcv5_256_SEED_BYTES);
-    xof_get_bytes(&ctx_kem, sigma, hqcv5_256_PARAM_SECURITY_BYTES);
+    hqcv5_256_xof_init(&ctx_kem, seed_kem, hqcv5_256_SEED_BYTES);
+    hqcv5_256_xof_get_bytes(&ctx_kem, seed_pke, hqcv5_256_SEED_BYTES);
+    hqcv5_256_xof_get_bytes(&ctx_kem, sigma, hqcv5_256_PARAM_SECURITY_BYTES);
 
     // Compute HQC-PKE keypair
     hqcv5_256_hqc_pke_keygen(ek_pke, dk_pke, seed_pke);
@@ -95,12 +95,12 @@ int hqcv5_256_crypto_kem_keypair(uint8_t *ek_kem, uint8_t *dk_kem) {
  *
  * @return Returns 0 on success.
  *
- * @pre The PRNG **must be seeded** with ::prng_init() before calling this function.
- * @warning This function calls ::prng_get_bytes() to sample `seed_kem`. If the PRNG has not been
+ * @pre The PRNG **must be seeded** with ::hqcv5_256_prng_init() before calling this function.
+ * @warning This function calls ::hqcv5_256_prng_get_bytes() to sample `seed_kem`. If the PRNG has not been
  *          properly seeded beforehand, the generated keys will be insecure/predictable.
  * @note An example of correct seeding is provided in `main_hqc.c` (see `hqcv5_256_init_randomness()`), which
  *       seeds the PRNG using `syscall(SYS_getrandom, ...)` (32 bytes) by default..
- * @see prng_init, prng_get_bytes, main_hqc.c
+ * @see hqcv5_256_prng_init, hqcv5_256_prng_get_bytes, main_hqc.c
  */
 int hqcv5_256_crypto_kem_enc(uint8_t *c_kem, uint8_t *K, const uint8_t *ek_kem) {
 #ifdef VERBOSE
@@ -114,12 +114,12 @@ int hqcv5_256_crypto_kem_enc(uint8_t *c_kem, uint8_t *K, const uint8_t *ek_kem) 
     hqcv5_256_ciphertext_kem_t c_kem_t = {0};
 
     // Sample message m and salt
-    prng_get_bytes(m, hqcv5_256_PARAM_SECURITY_BYTES);
-    prng_get_bytes(c_kem_t.salt, hqcv5_256_SALT_BYTES);
+    hqcv5_256_prng_get_bytes(m, hqcv5_256_PARAM_SECURITY_BYTES);
+    hqcv5_256_prng_get_bytes(c_kem_t.salt, hqcv5_256_SALT_BYTES);
 
     // Compute shared key K and ciphertext c_kem
-    hash_h(hash_ek_kem, ek_kem);
-    hash_g(K_theta, hash_ek_kem, m, c_kem_t.salt);
+    hqcv5_256_hash_h(hash_ek_kem, ek_kem);
+    hqcv5_256_hash_g(K_theta, hash_ek_kem, m, c_kem_t.salt);
     memcpy(theta, K_theta + hqcv5_256_SEED_BYTES, hqcv5_256_SEED_BYTES);
     hqcv5_256_hqc_pke_encrypt(&c_kem_t.c_pke, ek_kem, (uint64_t *)m, theta);
 
@@ -192,8 +192,8 @@ int hqcv5_256_crypto_kem_dec(uint8_t *K_prime, const uint8_t *c_kem, const uint8
     result = hqcv5_256_hqc_pke_decrypt((uint64_t *)m_prime, dk_pke, &c_kem_t.c_pke);
 
     // Compute shared key K_prime and ciphertext c_kem_prime
-    hash_h(hash_ek_kem, ek_pke);
-    hash_g(K_theta_prime, hash_ek_kem, m_prime, c_kem_t.salt);
+    hqcv5_256_hash_h(hash_ek_kem, ek_pke);
+    hqcv5_256_hash_g(K_theta_prime, hash_ek_kem, m_prime, c_kem_t.salt);
     memcpy(K_prime, K_theta_prime, hqcv5_256_SHARED_SECRET_BYTES);
     memcpy(theta_prime, K_theta_prime + hqcv5_256_SHARED_SECRET_BYTES, hqcv5_256_SEED_BYTES);
 
@@ -201,7 +201,7 @@ int hqcv5_256_crypto_kem_dec(uint8_t *K_prime, const uint8_t *c_kem, const uint8
     memcpy(c_kem_prime_t.salt, c_kem_t.salt, hqcv5_256_SALT_BYTES);
 
     // Compute rejection key K_bar
-    hash_j(K_bar, hash_ek_kem, sigma, &c_kem_t);
+    hqcv5_256_hash_j(K_bar, hash_ek_kem, sigma, &c_kem_t);
     result |= hqcv5_256_vect_compare((uint8_t *)c_kem_t.c_pke.u, (uint8_t *)c_kem_prime_t.c_pke.u, hqcv5_256_VEC_N_SIZE_BYTES);
     result |= hqcv5_256_vect_compare((uint8_t *)c_kem_t.c_pke.v, (uint8_t *)c_kem_prime_t.c_pke.v, hqcv5_256_VEC_N1N2_SIZE_BYTES);
     result |= hqcv5_256_vect_compare(c_kem_t.salt, c_kem_prime_t.salt, hqcv5_256_SALT_BYTES);

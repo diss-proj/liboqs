@@ -51,10 +51,10 @@ int main(void) {
 
     for (int i = 0; i < 48; i++) entropy_input[i] = i;
 
-    prng_init(entropy_input, NULL, 48, 0);
+    hqcv5_256_prng_init(entropy_input, NULL, 48, 0);
     for (int i = 0; i < 100; i++) {
         fprintf(fp_req, "count = %d\n", i);
-        prng_get_bytes(seed, 48);
+        hqcv5_256_prng_get_bytes(seed, 48);
         fprintBstr(fp_req, "seed = ", seed, 48);
         fprintf(fp_req, "pk =\n");
         fprintf(fp_req, "sk =\n");
@@ -86,7 +86,7 @@ int main(void) {
         }
         fprintBstr(fp_rsp, "seed = ", seed, 48);
 
-        prng_init(seed, NULL, 48, 0);
+        hqcv5_256_prng_init(seed, NULL, 48, 0);
 
         // Generate the public/private keypair
         if ((ret_val = hqcv5_256_crypto_kem_keypair(pk, sk)) != 0) {

@@ -59,7 +59,7 @@ static inline uint32_t hqcv5_128_barrett_reduce(uint32_t x) {
  * @param[out]    support Output array to store the `weight` unique indices.
  * @param[in]     weight  Desired Hamming weight.
  */
-void hqcv5_128_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
+void hqcv5_128_vect_generate_random_support1(hqcv5_128_shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
     size_t random_bytes_size = 3 * weight;
     uint8_t rand_bytes[3 * hqcv5_128_PARAM_OMEGA_R] = {0};
     uint8_t inc;
@@ -70,7 +70,7 @@ void hqcv5_128_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *su
     while (i < weight) {
         do {
             if (j == random_bytes_size) {
-                xof_get_bytes(ctx, rand_bytes, random_bytes_size);
+                hqcv5_128_xof_get_bytes(ctx, rand_bytes, random_bytes_size);
                 j = 0;
             }
 
@@ -101,10 +101,10 @@ void hqcv5_128_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *su
  * @param[out]    support Output array of unique indices (the support set).
  * @param[in]     weight  Number of elements to generate (Hamming weight).
  */
-void hqcv5_128_vect_generate_random_support2(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
+void hqcv5_128_vect_generate_random_support2(hqcv5_128_shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
     uint32_t rand_u32[hqcv5_128_PARAM_OMEGA_R] = {0};
 
-    xof_get_bytes(ctx, (uint8_t *)&rand_u32, 4 * weight);
+    hqcv5_128_xof_get_bytes(ctx, (uint8_t *)&rand_u32, 4 * weight);
 
     for (size_t i = 0; i < weight; ++i) {
         uint64_t buff = rand_u32[i];
@@ -171,7 +171,7 @@ void hqcv5_128_vect_write_support_to_vector(uint64_t *v, uint32_t *support, uint
  *                        bits set to 1.
  * @param[in]     weight  Desired Hamming weight.
  */
-void hqcv5_128_vect_sample_fixed_weight1(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
+void hqcv5_128_vect_sample_fixed_weight1(hqcv5_128_shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
     uint32_t support[hqcv5_128_PARAM_OMEGA_R] = {0};
     hqcv5_128_vect_generate_random_support1(ctx, support, weight);
     hqcv5_128_vect_write_support_to_vector(v, support, weight);
@@ -190,7 +190,7 @@ void hqcv5_128_vect_sample_fixed_weight1(shake256_xof_ctx *ctx, uint64_t *v, uin
  *                        bits set to 1.
  * @param[in]     weight  Desired Hamming weight.
  */
-void hqcv5_128_vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
+void hqcv5_128_vect_sample_fixed_weight2(hqcv5_128_shake256_xof_ctx *ctx, uint64_t *v, uint16_t weight) {
     uint32_t support[hqcv5_128_PARAM_OMEGA_R] = {0};
     hqcv5_128_vect_generate_random_support2(ctx, support, weight);
     hqcv5_128_vect_write_support_to_vector(v, support, weight);
@@ -205,8 +205,8 @@ void hqcv5_128_vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uin
  * @param[in] ctx Pointer to the context of the xof
  * @param[in] v Pointer to an array
  */
-void hqcv5_128_vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
-    xof_get_bytes(ctx, (uint8_t *)v, hqcv5_128_VEC_N_SIZE_BYTES);
+void hqcv5_128_vect_set_random(hqcv5_128_shake256_xof_ctx *ctx, uint64_t *v) {
+    hqcv5_128_xof_get_bytes(ctx, (uint8_t *)v, hqcv5_128_VEC_N_SIZE_BYTES);
     v[hqcv5_128_VEC_N_SIZE_64 - 1] &= BITMASK(hqcv5_128_PARAM_N, 64);
 }
 

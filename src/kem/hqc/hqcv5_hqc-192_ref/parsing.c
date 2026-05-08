@@ -17,7 +17,7 @@
  * @param[in]  dk_pke   Pointer to the serialized decryption key.
  */
 void hqcv5_192_hqc_dk_pke_from_string(uint64_t *y, const uint8_t *dk_pke) {
-    shake256_xof_ctx dk_xof_ctx = {0};
+    hqcv5_192_shake256_xof_ctx dk_xof_ctx = {0};
     hqcv5_192_xof_init(&dk_xof_ctx, dk_pke, hqcv5_192_SEED_BYTES);
     hqcv5_192_vect_sample_fixed_weight1(&dk_xof_ctx, y, hqcv5_192_PARAM_OMEGA);
 
@@ -33,7 +33,7 @@ void hqcv5_192_hqc_dk_pke_from_string(uint64_t *y, const uint8_t *dk_pke) {
  * @param[in]  ek_pke   Pointer to the serialized encryption key.
  */
 void hqcv5_192_hqc_ek_pke_from_string(uint64_t *h, uint64_t *s, const uint8_t *ek_pke) {
-    shake256_xof_ctx ek_xof_ctx = {0};
+    hqcv5_192_shake256_xof_ctx ek_xof_ctx = {0};
 
     hqcv5_192_xof_init(&ek_xof_ctx, ek_pke, hqcv5_192_SEED_BYTES);
     hqcv5_192_vect_set_random(&ek_xof_ctx, h);

@@ -31,8 +31,8 @@ void hqcv5_192_hqc_pke_keygen(uint8_t *ek_pke, uint8_t *dk_pke, uint8_t *seed) {
     uint8_t keypair_seed[2 * hqcv5_192_SEED_BYTES] = {0};
     uint8_t *seed_dk = keypair_seed;
     uint8_t *seed_ek = keypair_seed + hqcv5_192_SEED_BYTES;
-    shake256_xof_ctx dk_xof_ctx = {0};
-    shake256_xof_ctx ek_xof_ctx = {0};
+    hqcv5_192_shake256_xof_ctx dk_xof_ctx = {0};
+    hqcv5_192_shake256_xof_ctx ek_xof_ctx = {0};
 
     uint64_t x[hqcv5_192_VEC_N_SIZE_64] = {0};
     uint64_t y[hqcv5_192_VEC_N_SIZE_64] = {0};
@@ -95,7 +95,7 @@ void hqcv5_192_hqc_pke_keygen(uint8_t *ek_pke, uint8_t *dk_pke, uint8_t *seed) {
  *
  */
 void hqcv5_192_hqc_pke_encrypt(hqcv5_192_ciphertext_pke_t *c_pke, const uint8_t *ek_pke, const uint64_t *m, const uint8_t *theta) {
-    shake256_xof_ctx theta_xof_ctx = {0};
+    hqcv5_192_shake256_xof_ctx theta_xof_ctx = {0};
     uint64_t h[hqcv5_192_VEC_N_SIZE_64] = {0};
     uint64_t s[hqcv5_192_VEC_N_SIZE_64] = {0};
     uint64_t r1[hqcv5_192_VEC_N_SIZE_64] = {0};

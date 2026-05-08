@@ -31,8 +31,8 @@ void hqcv5_256_hqc_pke_keygen(uint8_t *ek_pke, uint8_t *dk_pke, uint8_t *seed) {
     uint8_t keypair_seed[2 * hqcv5_256_SEED_BYTES] = {0};
     uint8_t *seed_dk = keypair_seed;
     uint8_t *seed_ek = keypair_seed + hqcv5_256_SEED_BYTES;
-    shake256_xof_ctx dk_xof_ctx = {0};
-    shake256_xof_ctx ek_xof_ctx = {0};
+    hqcv5_256_shake256_xof_ctx dk_xof_ctx = {0};
+    hqcv5_256_shake256_xof_ctx ek_xof_ctx = {0};
 
     uint64_t x[hqcv5_256_VEC_N_SIZE_64] = {0};
     uint64_t y[hqcv5_256_VEC_N_SIZE_64] = {0};
@@ -40,15 +40,15 @@ void hqcv5_256_hqc_pke_keygen(uint8_t *ek_pke, uint8_t *dk_pke, uint8_t *seed) {
     uint64_t s[hqcv5_256_VEC_N_SIZE_64] = {0};
 
     // Derive keypair seeds
-    hash_i(keypair_seed, seed);
+    hqcv5_256_hash_i(keypair_seed, seed);
 
     // Compute decryption key
-    xof_init(&dk_xof_ctx, seed_dk, hqcv5_256_SEED_BYTES);
+    hqcv5_256_xof_init(&dk_xof_ctx, seed_dk, hqcv5_256_SEED_BYTES);
     hqcv5_256_vect_sample_fixed_weight1(&dk_xof_ctx, y, hqcv5_256_PARAM_OMEGA);
     hqcv5_256_vect_sample_fixed_weight1(&dk_xof_ctx, x, hqcv5_256_PARAM_OMEGA);
 
     // Compute encryption key
-    xof_init(&ek_xof_ctx, seed_ek, hqcv5_256_SEED_BYTES);
+    hqcv5_256_xof_init(&ek_xof_ctx, seed_ek, hqcv5_256_SEED_BYTES);
     hqcv5_256_vect_set_random(&ek_xof_ctx, h);
     hqcv5_256_vect_mul(s, y, h);
     hqcv5_256_vect_add(s, x, s, hqcv5_256_VEC_N_SIZE_64);
@@ -95,7 +95,7 @@ void hqcv5_256_hqc_pke_keygen(uint8_t *ek_pke, uint8_t *dk_pke, uint8_t *seed) {
  *
  */
 void hqcv5_256_hqc_pke_encrypt(hqcv5_256_ciphertext_pke_t *c_pke, const uint8_t *ek_pke, const uint64_t *m, const uint8_t *theta) {
-    shake256_xof_ctx theta_xof_ctx = {0};
+    hqcv5_256_shake256_xof_ctx theta_xof_ctx = {0};
     uint64_t h[hqcv5_256_VEC_N_SIZE_64] = {0};
     uint64_t s[hqcv5_256_VEC_N_SIZE_64] = {0};
     uint64_t r1[hqcv5_256_VEC_N_SIZE_64] = {0};
@@ -104,7 +104,7 @@ void hqcv5_256_hqc_pke_encrypt(hqcv5_256_ciphertext_pke_t *c_pke, const uint8_t 
     uint64_t tmp[hqcv5_256_VEC_N_SIZE_64] = {0};
 
     // Initialize Xof using theta
-    xof_init(&theta_xof_ctx, theta, hqcv5_256_SEED_BYTES);
+    hqcv5_256_xof_init(&theta_xof_ctx, theta, hqcv5_256_SEED_BYTES);
 
     // Retrieve h and s from public key
     hqcv5_256_hqc_ek_pke_from_string(h, s, ek_pke);
