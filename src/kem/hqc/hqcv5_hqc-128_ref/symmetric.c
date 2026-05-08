@@ -24,7 +24,7 @@ shake256incctx shake256_prng_ctx;
  * @param[in] enlen Length of entropy string in bytes
  * @param[in] perlen Length of the personalization string in bytes
  */
-void hqcv5_128_prng_init(uint8_t *entropy_input, uint8_t *personalization_string, uint32_t enlen, uint32_t perlen) {
+void prng_init(uint8_t *entropy_input, uint8_t *personalization_string, uint32_t enlen, uint32_t perlen) {
     uint8_t domain = hqcv5_128_HQC_PRNG_DOMAIN;
     shake256_inc_init(&shake256_prng_ctx);
     shake256_inc_absorb(&shake256_prng_ctx, entropy_input, enlen);
@@ -41,7 +41,7 @@ void hqcv5_128_prng_init(uint8_t *entropy_input, uint8_t *personalization_string
  * @param[out] output Pointer to output
  * @param[in] outlen length of output in bytes
  */
-void hqcv5_128_prng_get_bytes(uint8_t *output, uint32_t outlen) {
+void prng_get_bytes(uint8_t *output, uint32_t outlen) {
     shake256_inc_squeeze(output, outlen, &shake256_prng_ctx);
 }
 
@@ -52,7 +52,7 @@ void hqcv5_128_prng_get_bytes(uint8_t *output, uint32_t outlen) {
  * @param[in]  seed      Pointer to the input seed.
  * @param[in]  seed_size Size of the seed in bytes.
  */
-void hqcv5_128_xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size) {
+void xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t seed_size) {
     uint8_t xof_domain = hqcv5_128_HQC_XOF_DOMAIN;
     shake256_inc_init(xof_ctx);
     shake256_inc_absorb(xof_ctx, seed, seed_size);
@@ -69,9 +69,9 @@ void hqcv5_128_xof_init(shake256_xof_ctx *xof_ctx, const uint8_t *seed, uint32_t
  *
  * @details This function squeezes the specified number of pseudorandom bytes from
  * the SHAKE256 XOF context and stores them in the provided output buffer.
- * The context must have been initialized beforehand using `hqcv5_128_xof_init()`.
+ * The context must have been initialized beforehand using `xof_init()`.
  */
-void hqcv5_128_xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_t output_size) {
+void xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_t output_size) {
     const uint8_t bsize = sizeof(uint64_t);
     const uint8_t remainder = output_size % bsize;
     uint8_t tmp[sizeof(uint64_t)];
@@ -94,7 +94,7 @@ void hqcv5_128_xof_get_bytes(shake256_xof_ctx *xof_ctx, uint8_t *output, uint32_
  * @details This function implements the random oracle `I` as specified,
  * using the SHA3-512 hash function. It produces a 64-byte output from the given seed.
  */
-void hqcv5_128_hash_i(uint8_t *output, const uint8_t *seed) {
+void hash_i(uint8_t *output, const uint8_t *seed) {
     sha3_512_ctx i_hash_ctx = {0};
     uint8_t i_domain = hqcv5_128_HQC_I_FCT_DOMAIN;
     sha3_512_inc_init(&i_hash_ctx);
@@ -109,7 +109,7 @@ void hqcv5_128_hash_i(uint8_t *output, const uint8_t *seed) {
  * @param[out] output      Buffer (32 bytes) to receive the hash output.
  * @param[in]  ek_kem      Encapsulation key of the KEM.
  */
-void hqcv5_128_hash_h(uint8_t *output, const uint8_t ek_kem[hqcv5_128_PUBLIC_KEY_BYTES]) {
+void hash_h(uint8_t *output, const uint8_t ek_kem[hqcv5_128_PUBLIC_KEY_BYTES]) {
     sha3_256_ctx h_hash_ctx = {0};
     uint8_t h_domain = hqcv5_128_HQC_H_FCT_DOMAIN;
     sha3_256_inc_init(&h_hash_ctx);
@@ -126,7 +126,7 @@ void hqcv5_128_hash_h(uint8_t *output, const uint8_t ek_kem[hqcv5_128_PUBLIC_KEY
  * @param[in]  m             Message bytes.
  * @param[in]  salt          Salt value.
  */
-void hqcv5_128_hash_g(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_128_SEED_BYTES], const uint8_t m[hqcv5_128_PARAM_SECURITY_BYTES],
+void hash_g(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_128_SEED_BYTES], const uint8_t m[hqcv5_128_PARAM_SECURITY_BYTES],
             const uint8_t salt[hqcv5_128_SALT_BYTES]) {
     sha3_512_ctx g_hash_ctx = {0};
     uint8_t i_domain = hqcv5_128_HQC_G_FCT_DOMAIN;
@@ -146,7 +146,7 @@ void hqcv5_128_hash_g(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_128_SEED_
  * @param[in]  sigma        The string sigma.
  * @param[in]  c_kem        Pointer to ciphertext struct (includes c_pke.u, c_pke.v, and salt).
  */
-void hqcv5_128_hash_j(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_128_SEED_BYTES], const uint8_t sigma[hqcv5_128_PARAM_SECURITY_BYTES],
+void hash_j(uint8_t *output, const uint8_t hash_ek_kem[hqcv5_128_SEED_BYTES], const uint8_t sigma[hqcv5_128_PARAM_SECURITY_BYTES],
             const hqcv5_128_ciphertext_kem_t *c_kem) {
     sha3_256_ctx k_hash_ctx = {0};
     uint8_t k_domain = hqcv5_128_HQC_J_FCT_DOMAIN;

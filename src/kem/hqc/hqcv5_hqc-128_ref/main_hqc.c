@@ -27,7 +27,7 @@ static void hqcv5_128_init_randomness(void) {
         }
         filled += (size_t)got;
     }
-    hqcv5_128_prng_init(seed, NULL, sizeof seed, 0);
+    prng_init(seed, NULL, sizeof seed, 0);
 #endif
 }
 

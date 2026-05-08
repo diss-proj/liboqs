@@ -18,7 +18,7 @@
  */
 void hqcv5_128_hqc_dk_pke_from_string(uint64_t *y, const uint8_t *dk_pke) {
     shake256_xof_ctx dk_xof_ctx = {0};
-    hqcv5_128_xof_init(&dk_xof_ctx, dk_pke, hqcv5_128_SEED_BYTES);
+    xof_init(&dk_xof_ctx, dk_pke, hqcv5_128_SEED_BYTES);
     hqcv5_128_vect_sample_fixed_weight1(&dk_xof_ctx, y, hqcv5_128_PARAM_OMEGA);
 
     // Zeroize sensitive data
@@ -35,7 +35,7 @@ void hqcv5_128_hqc_dk_pke_from_string(uint64_t *y, const uint8_t *dk_pke) {
 void hqcv5_128_hqc_ek_pke_from_string(uint64_t *h, uint64_t *s, const uint8_t *ek_pke) {
     shake256_xof_ctx ek_xof_ctx = {0};
 
-    hqcv5_128_xof_init(&ek_xof_ctx, ek_pke, hqcv5_128_SEED_BYTES);
+    xof_init(&ek_xof_ctx, ek_pke, hqcv5_128_SEED_BYTES);
     hqcv5_128_vect_set_random(&ek_xof_ctx, h);
 
     memcpy(s, ek_pke + hqcv5_128_SEED_BYTES, hqcv5_128_VEC_N_SIZE_BYTES);

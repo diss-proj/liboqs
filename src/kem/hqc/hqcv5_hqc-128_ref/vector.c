@@ -70,7 +70,7 @@ void hqcv5_128_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *su
     while (i < weight) {
         do {
             if (j == random_bytes_size) {
-                hqcv5_128_xof_get_bytes(ctx, rand_bytes, random_bytes_size);
+                xof_get_bytes(ctx, rand_bytes, random_bytes_size);
                 j = 0;
             }
 
@@ -104,7 +104,7 @@ void hqcv5_128_vect_generate_random_support1(shake256_xof_ctx *ctx, uint32_t *su
 void hqcv5_128_vect_generate_random_support2(shake256_xof_ctx *ctx, uint32_t *support, uint16_t weight) {
     uint32_t rand_u32[hqcv5_128_PARAM_OMEGA_R] = {0};
 
-    hqcv5_128_xof_get_bytes(ctx, (uint8_t *)&rand_u32, 4 * weight);
+    xof_get_bytes(ctx, (uint8_t *)&rand_u32, 4 * weight);
 
     for (size_t i = 0; i < weight; ++i) {
         uint64_t buff = rand_u32[i];
@@ -206,7 +206,7 @@ void hqcv5_128_vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uin
  * @param[in] v Pointer to an array
  */
 void hqcv5_128_vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
-    hqcv5_128_xof_get_bytes(ctx, (uint8_t *)v, hqcv5_128_VEC_N_SIZE_BYTES);
+    xof_get_bytes(ctx, (uint8_t *)v, hqcv5_128_VEC_N_SIZE_BYTES);
     v[hqcv5_128_VEC_N_SIZE_64 - 1] &= BITMASK(hqcv5_128_PARAM_N, 64);
 }
 
