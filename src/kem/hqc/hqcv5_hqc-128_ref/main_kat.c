@@ -51,10 +51,10 @@ int main(void) {
 
     for (int i = 0; i < 48; i++) entropy_input[i] = i;
 
-    prng_init(entropy_input, NULL, 48, 0);
+    hqcv5_128_prng_init(entropy_input, NULL, 48, 0);
     for (int i = 0; i < 100; i++) {
         fprintf(fp_req, "count = %d\n", i);
-        prng_get_bytes(seed, 48);
+        hqcv5_128_prng_get_bytes(seed, 48);
         fprintBstr(fp_req, "seed = ", seed, 48);
         fprintf(fp_req, "pk =\n");
         fprintf(fp_req, "sk =\n");
@@ -86,18 +86,18 @@ int main(void) {
         }
         fprintBstr(fp_rsp, "seed = ", seed, 48);
 
-        prng_init(seed, NULL, 48, 0);
+        hqcv5_128_prng_init(seed, NULL, 48, 0);
 
         // Generate the public/private keypair
-        if ((ret_val = crypto_kem_keypair(pk, sk)) != 0) {
-            printf("crypto_kem_keypair returned <%d>\n", ret_val);
+        if ((ret_val = hqcv5_128_crypto_kem_keypair(pk, sk)) != 0) {
+            printf("hqcv5_128_crypto_kem_keypair returned <%d>\n", ret_val);
             return KAT_CRYPTO_FAILURE;
         }
         fprintBstr(fp_rsp, "pk = ", pk, hqcv5_128_CRYPTO_PUBLICKEYBYTES);
         fprintBstr(fp_rsp, "sk = ", sk, hqcv5_128_CRYPTO_SECRETKEYBYTES);
 
-        if ((ret_val = crypto_kem_enc(ct, ss, pk)) != 0) {
-            printf("crypto_kem_enc returned <%d>\n", ret_val);
+        if ((ret_val = hqcv5_128_crypto_kem_enc(ct, ss, pk)) != 0) {
+            printf("hqcv5_128_crypto_kem_enc returned <%d>\n", ret_val);
             return KAT_CRYPTO_FAILURE;
         }
         fprintBstr(fp_rsp, "ct = ", ct, hqcv5_128_CRYPTO_CIPHERTEXTBYTES);
@@ -105,13 +105,13 @@ int main(void) {
 
         fprintf(fp_rsp, "\n");
 
-        if ((ret_val = crypto_kem_dec(ss1, ct, sk)) != 0) {
-            printf("crypto_kem_dec returned <%d>\n", ret_val);
+        if ((ret_val = hqcv5_128_crypto_kem_dec(ss1, ct, sk)) != 0) {
+            printf("hqcv5_128_crypto_kem_dec returned <%d>\n", ret_val);
             return KAT_CRYPTO_FAILURE;
         }
 
         if (memcmp(ss, ss1, hqcv5_128_CRYPTO_BYTES)) {
-            printf("crypto_kem_dec returned bad 'ss' value\n");
+            printf("hqcv5_128_crypto_kem_dec returned bad 'ss' value\n");
             return KAT_CRYPTO_FAILURE;
         }
 

@@ -14,9 +14,9 @@
 extern void *(*volatile memset_volatile)(void *, int, size_t);
 
 /**
- * @def memset_zero
+ * @def hqcv5_128_memset_zero
  * @brief Securely zero a memory region.
  */
-#define memset_zero(ptr, len) memset_volatile((ptr), 0, (len))
+#define hqcv5_128_memset_zero(ptr, len) memset_volatile((ptr), 0, (len))
 
 #endif  // HQC_CRYPTO_MEMSET_H

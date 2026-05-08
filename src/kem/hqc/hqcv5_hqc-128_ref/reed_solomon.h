@@ -3,8 +3,8 @@
  * @brief Header file of reed_solomon.c
  */
 
-#ifndef HQC_REED_SOLOMON_H
-#define HQC_REED_SOLOMON_H
+#ifndef hqcv5_128_HQC_REED_SOLOMON_H
+#define hqcv5_128_HQC_REED_SOLOMON_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -18,7 +18,7 @@
  *   - row index \e i in [0 … 29],
  *   - column index \e j in [0 … 44].
  */
-static const uint16_t alpha_ij_pow[30][45] = {
+static const uint16_t hqcv5_128_alpha_ij_pow[30][45] = {
     {2,   4, 8, 16, 32, 64, 128, 29,  58,  116, 232, 205, 135, 19, 38,  76, 152, 45,  90,  180, 117, 234, 201,
      143, 3, 6, 12, 24, 48, 96,  192, 157, 39,  78,  156, 37,  74, 148, 53, 106, 212, 181, 119, 238, 193},
     {4,  16, 64, 29, 116, 205, 19,  76,  45, 180, 234, 143, 6,   24,  96, 157, 78,  37,  148, 106, 181, 238, 159,
@@ -80,9 +80,9 @@ static const uint16_t alpha_ij_pow[30][45] = {
     {96, 185, 223, 59,  85, 150, 89,  44,  38,  193, 15, 26, 169, 145, 100, 36, 1,   96, 185, 223, 59,  85, 150,
      89, 44,  38,  193, 15, 26,  169, 145, 100, 36,  1,  96, 185, 223, 59,  85, 150, 89, 44,  38,  193, 15}};
 
-void reed_solomon_encode(uint64_t* cdw, const uint64_t* msg);
-void reed_solomon_decode(uint64_t* msg, uint64_t* cdw);
+void hqcv5_128_reed_solomon_encode(uint64_t* cdw, const uint64_t* msg);
+void hqcv5_128_reed_solomon_decode(uint64_t* msg, uint64_t* cdw);
 
-void compute_generator_poly(uint16_t* poly);
+void hqcv5_128_compute_generator_poly(uint16_t* poly);
 
-#endif  // HQC_REED_SOLOMOM_H
+#endif  // hqcv5_128_HQC_REED_SOLOMOM_H
