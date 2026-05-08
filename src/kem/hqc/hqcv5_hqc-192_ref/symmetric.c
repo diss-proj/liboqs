@@ -8,11 +8,11 @@
 #include <stdint.h>
 
 /**
- * @typedef shake256_prng_ctx
+ * @typedef hqcv5_192_shake256_prng_ctx
  * @brief Incremental SHAKE-256 prng context.
  *
  */
-shake256incctx shake256_prng_ctx;
+shake256incctx hqcv5_192_shake256_prng_ctx;
 
 /**
  * @brief SHAKE-256 with incremental API and domain separation
@@ -26,11 +26,11 @@ shake256incctx shake256_prng_ctx;
  */
 void hqcv5_192_prng_init(uint8_t *entropy_input, uint8_t *personalization_string, uint32_t enlen, uint32_t perlen) {
     uint8_t domain = hqcv5_192_HQC_PRNG_DOMAIN;
-    shake256_inc_init(&shake256_prng_ctx);
-    shake256_inc_absorb(&shake256_prng_ctx, entropy_input, enlen);
-    shake256_inc_absorb(&shake256_prng_ctx, personalization_string, perlen);
-    shake256_inc_absorb(&shake256_prng_ctx, &domain, 1);
-    shake256_inc_finalize(&shake256_prng_ctx);
+    shake256_inc_init(&hqcv5_192_shake256_prng_ctx);
+    shake256_inc_absorb(&hqcv5_192_shake256_prng_ctx, entropy_input, enlen);
+    shake256_inc_absorb(&hqcv5_192_shake256_prng_ctx, personalization_string, perlen);
+    shake256_inc_absorb(&hqcv5_192_shake256_prng_ctx, &domain, 1);
+    shake256_inc_finalize(&hqcv5_192_shake256_prng_ctx);
 }
 
 /**
@@ -42,7 +42,7 @@ void hqcv5_192_prng_init(uint8_t *entropy_input, uint8_t *personalization_string
  * @param[in] outlen length of output in bytes
  */
 void hqcv5_192_prng_get_bytes(uint8_t *output, uint32_t outlen) {
-    shake256_inc_squeeze(output, outlen, &shake256_prng_ctx);
+    shake256_inc_squeeze(output, outlen, &hqcv5_192_shake256_prng_ctx);
 }
 
 /**
