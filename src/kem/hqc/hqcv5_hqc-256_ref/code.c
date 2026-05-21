@@ -1,0 +1,62 @@
+/**
+ * @file code.c
+ * @brief Implementation of concatenated code
+ */
+
+#include "code.h"
+#include <stdint.h>
+#include "crypto_memset.h"
+#include "parameters.h"
+#include "reed_muller.h"
+#include "reed_solomon.h"
+#ifdef VERBOSE
+#include <stdio.h>
+#include "vector.h"
+#endif
+
+/**
+ *
+ * @brief Encoding the message m to a code word em using the concatenated code
+ *
+ * First we encode the message using the Reed-Solomon code, then with the duplicated Reed-Muller code we obtain
+ * a concatenated code word.
+ *
+ * @param[out] em Pointer to an array that is a code word
+ * @param[in] m Pointer to an array that is the message
+ */
+void hqcv5_256_code_encode(uint64_t *em, const uint64_t *m) {
+    uint64_t tmp[hqcv5_256_VEC_N1_SIZE_64] = {0};
+
+    hqcv5_256_reed_solomon_encode(tmp, m);
+    hqcv5_256_reed_muller_encode(em, tmp);
+
+#ifdef VERBOSE
+    printf("\n\nReed-Solomon code word: ");
+    hqcv5_256_vect_print(tmp, hqcv5_256_VEC_N1_SIZE_BYTES);
+    printf("\n\nConcatenated code word: ");
+    hqcv5_256_vect_print(em, hqcv5_256_VEC_N1N2_SIZE_BYTES);
+#endif
+    // Zeroize sensitive data
+    hqcv5_256_memset_zero(tmp, sizeof tmp);
+}
+
+/**
+ * @brief Decoding the code word em to a message m using the concatenated code
+ *
+ * @param[out] m Pointer to an array that is the message
+ * @param[in] em Pointer to an array that is the code word
+ */
+void hqcv5_256_code_decode(uint64_t *m, const uint64_t *em) {
+    uint64_t tmp[hqcv5_256_VEC_N1_SIZE_64] = {0};
+
+    hqcv5_256_reed_muller_decode(tmp, em);
+    hqcv5_256_reed_solomon_decode(m, tmp);
+
+#ifdef VERBOSE
+    printf("\n\nReed-Muller decoding result (the input for the Reed-Solomon decoding algorithm): ");
+    hqcv5_256_vect_print(tmp, hqcv5_256_VEC_N1_SIZE_BYTES);
+#endif
+
+    // Zeroize sensitive data
+    hqcv5_256_memset_zero(tmp, sizeof tmp);
+}
