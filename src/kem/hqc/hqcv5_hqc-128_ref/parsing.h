@@ -6,7 +6,7 @@
 #ifndef hqcv5_128_HQC_PARSING_H
 #define hqcv5_128_HQC_PARSING_H
 
-#include <immintrin.h>
+
 #include <stdint.h>
 #include "data_structures.h"
 #include "parameters.h"

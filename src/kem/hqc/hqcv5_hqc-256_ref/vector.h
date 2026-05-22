@@ -6,7 +6,7 @@
 #ifndef hqcv5_256_HQC_VECTOR_H
 #define hqcv5_256_HQC_VECTOR_H
 
-#include <immintrin.h>
+
 #include <stdint.h>
 #include "symmetric.h"
 
