@@ -13,7 +13,7 @@ OQS_KEM *OQS_KEM_hqc_256_new(void) {
 		return NULL;
 	}
 	kem->method_name = OQS_KEM_alg_hqc_256;
-	kem->alg_version = "hqc-submission_2023-04-30 via https://github.com/SWilson4/package-pqclean/tree/9b509aa7/hqc";
+	kem->alg_version = "hqc v5.0.0 at https://gitlab.com/pqc-hqc/hqc/-/tree/v5.0.0?ref_type=tags";
 
 	kem->claimed_nist_level = 5;
 	kem->ind_cca = true;
